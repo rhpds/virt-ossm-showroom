@@ -1,0 +1,4 @@
+.Module 1 - Introduction to modernizing VMs on OpenShift
+* xref:intro.adoc[Introduction]
+* xref:walkthrough.adoc[Walkthrough]
+* xref:finish.adoc[Finish]

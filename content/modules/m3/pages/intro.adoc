@@ -1,0 +1,11 @@
+# Module 3: Enhancing Networking with OpenShift Service Mesh (OSSM)
+
+## ABOUT THIS LAB
+
+In this lab scenario you will explore added features OpenShift has on offer to elevate the experience of operating and monitoring VMs as first class citizens in the cloud native world.  
+
+
+## Objectives
+
+* Integrate VMs with OpenShift Service Mesh for advanced networking
+* Implement traffic management and observability features

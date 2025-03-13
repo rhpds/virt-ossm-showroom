@@ -1,0 +1,45 @@
+# Module 3: Enhancing Networking with OpenShift Service Mesh (OSSM)
+
+# (REMOVE) Prerequisites - Technical Steps 
+
+* Deploy OpenShift Service Mesh
+* Install the OSSM operator
+* Configure an Istio control plane
+* Connect VMs to the Service Mesh **WARNING** this cannot be predone because it give a network issue where VM pods cannot connect to each other due to sidecar. **HOW WILL WE TRIGGER THIS SO THEY DON'T HAVE TO DO ALL VMS?**
+
+
+# (REMOVE) Hands-On - Technical Steps
+
+## Task 1: Explore what the OpenShift Service Mesh world is and what it offers
+
+. Go to istio-system and have a look at the SMCP
+. The SM Components wha are they, what do they offer, how do I find them?
+. Login to Kiali and watch nothing
+. Login to Jaeger and watch nothing
+
+Task 1: 
+
+## Task 2: Enable your VM to be part of the mesh and connect to cloud native components
+
+. Add the 3 namespaces to the Mesh - SMMR (**NOTE:** maybe this script updates all other VMs/containers with the sidecar annotation and restarts them)
+
+
+. Add the VM to a service mesh project
+
+* Add the applications to the Mesh - istio injection
+* Restart the apps - 
+
+. Validate everything in the observability stack
+
+* Kiali - mtls, graph, traffic distribution, 
+* Tracing console
+* Istio metrics captured in OCP observability stack
+* Grafana
+
+**Bonus Point: ** Why is the travel-dashboard not accessible? Maybe as fun point we get 10 t-shirts and in each module we get them to **think** and first 10 ppl that answer the questions correctly get the t-shirts. Can we get budget or from OCP Virt / Mesh BUs to provide the t-shirts?
+
+
+
+
+
+
