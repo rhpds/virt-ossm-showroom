@@ -1,0 +1,24 @@
+# Module 1 - Introduction to modernizing VMs on OpenShift
+
+This set of labs is all about giving you the ability to go beyond understanding and using OpenShift as another platform of running Virtual Machines. We want you to actually make them first class citizens in a Cloud Native World. But, what is `Cloud Native` really and why should you care?
+
+## Cloud Native is Patterns (CNCF)
+
+* *Availability* -> Microservices & Netflix for everyone
+* *Automation* ->  Deployment & Management
+* *Acceleration* -> CI/CD & “the ABCDE” of automation
+* *Anywhere!* ->  Containers are portable
+
+## Patterns need Tools 
+
+Today you will experience these added capabilities through OpenShift tooling that will enable you to elevate the capabilities of your migrated Virtual Machines to be on par with containerised Cloud Native applications already.
+
+ You will experience  how you can take advantage the tools that come with OpenShift such as:
+
+* Kubernetes - container orchestration
+* Prometheus - monitoring & analysis
+* OpenTracing - tracing interop
+* Service mesh - traffic management, security, observability and resillience
+* GitOps - declarative configuration, deployment automation and recovery
+
+## TASK BEGIN HERE (TBD)

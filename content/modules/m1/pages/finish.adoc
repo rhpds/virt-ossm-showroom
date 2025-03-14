@@ -1,0 +1,5 @@
+# Module 1 - Introduction to modernizing VMs on OpenShift
+
+## Congratulations on completing this module!
+
+In the next scenario you will be setting up the ...
