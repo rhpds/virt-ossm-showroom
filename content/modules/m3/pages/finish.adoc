@@ -2,5 +2,7 @@
 
 ## Congratulations on completing this module!
 
-In the next scenario you will be setting up the development environment and verifying it with the Service Mesh provided observability stack.
+You have already experienced the ease with which a VM can be enhanced with features of cross-cutting concern (security, observability) in a clout native world. 
+
+In the next scenario you will be going further by configuring resilliency, fault-tolerance and automation of managing multiple versions of your applications.
 

@@ -12,61 +12,160 @@
 
 Moving Virtual Machines into OpenShift enabled you to expose and scale the applications running within through the configuration of a `Service` controller resulting in a loadbalancer called that routes the traffic to all instances of the Virtual Machines. However, the ease with which this is possible results in added complexity when creating appropriate ring-fencing around access rights to a Virtual Machine, level of throughput, monitoring of the traffic load it receives, releasing new versions of it and providing resillience.
 
-image::OSSM-ServiceMesh.png[]
+image::01-OSSM-ServiceMesh.png[]
 
-OpenShift comes with Service Mesh which is an add-on service layer added to assist in solving 4 main use cases in the Cloud Native world:
+OpenShift comes with Service Mesh which is an add-on service layer which assist in solving 4 main use cases in the Cloud Native world:
 
 . Security
 . Traffic Management
 . Observability
 . Resilliene & Error Handling
 
-Lets see how a Virtual Machine can take advantage of this service.
+The administrators have already done the setup of Service Mesh so lets see how easy it is to enable a a Virtual Machine to take advantage of these new capabilities.
 
 ## Task 1: Explore what the OpenShift Service Mesh world is and what it offers
 
 Firstly, lets explore a few of the components of Service Mesh as it will offer clarity on the results of the activities you will undertake in the follow-up sections.
 
-image::OSSM-Components.png[]
+image::02-OSSM-Components.png[]
 
-OpenShift Service Mesh is delivered as part of the platform through an operator which is a specialised program to deliver the mesh components. These include:
+OpenShift Service Mesh is delivered as part of the platform through an operator which is a specialised program to deliver the mesh runtime components. These include:
 
-* *istiod*: a component that will apply all your defined policies (security, traffic management etc.) in the network of Virtual Machines or containers included in the mesh.
-* *envoy*: a component that enhances your Virtual Machines with the ability to read and apply the policies.
-* *Kiali*: an observability component which visualises what is configured in the mesh, the network of included applications and a host of other visualisation capabilities:
+* *istiod*: a component that will apply all your defined policies (security, traffic management etc.) in the network of Virtual Machines and containers included in the mesh.
+* *envoy*: a component that enhances your Virtual Machines with the ability to read and apply the policies and effectively makes your Virtual Machine part of the mesh. The envoy sits next to your Virtual Machine (see the image above) and intercepts all requests coming in and out of it.
+* *Kiali*: an observability component which visualises what is configured in the mesh, the network of included applications, the traffic throughut/latency, the security utilised and a host of other visualisation capabilities.
 * The rest of the observbility components (as seen in the image above) contain parts of what _kiali_ visualises eg. metrics, traces etc.
+* *Gatewas*: one or more ingress gateway components are made available to allow traffic flowing into mesh included services from the outside as the mesh comes with network policies that disable direct access to them and an egress gateway respectively can allow outgoing traffic from the mesh to external services.
 
 
+## Task 2: Access the Observability Stack
+
+Remember one of the capabilities the service mesh adds is to enhance OpenShift and deployed components observability without the need for the applications within the Virtual Machines to be altered. 
+
+Lets find the URLs of the observability components by executing the following commands in your terminal.
+
+NOTE: The service mesh components have been installed by the platform team in the `istio-system` namespace.
+
+[source,yaml,subs=attributes]
+----
+echo "http://$(oc get route kiali -o jsonpath='{.spec.host}' -n istio-system)"
+echo "https://$(oc get route jaeger -o jsonpath='{.spec.host}' -n istio-system)"
+echo "https://$(oc get route prometheus -o jsonpath='{.spec.host}' -n istio-system)"
+echo "https://$(oc get route grafana -o jsonpath='{.spec.host}' -n istio-system)"
+
+----
+
+. Login to the `Jaeger` dashboard to check the traffic traces for the _Travel Agency_ solution:
++
+* Follow the link to the Jaeger URL (login with `OpenShift`` (username/password) and in the `Authorize Access` page select `Allow selected permissions`).
+* In the Jaeger dashboard you should be able see traces of the traffic flowing between any components that are part of the mesh. In the `Service` drop down list you can select the service that traffic is originating from and in the `Operation` drop down *WHAT*?
+* Currently, you should see there are no services listed. *Can you figure out based on the information provided in Task 1 why that is?*
++
+image::03-t2-jaeger-empty.png[]
+* Leave the 'Jaeger' dahsboard in your browser and proceed to the next task.
+
+. Login to the `Grafana` dashboard and to view via the precreated Istio Grafana dashboards service, traffic volume for the _Travel Agency_ solution:
+* Follow the link to the `Grafana` URL (login with `OpenShift`` (username/password) and in the `Authorize Access` page select `Allow selected permissions`).
+* From the left of the menu follow *Dashboards* → *Browse* → *Istio* → *Istio Mesh Dashboard* to access the Grafana dashboard that should show the services in the mesh and the traffic volume as well as HTTP codes of sucess failure of the requests.
+* Currently, you should see there are no services listed or traffic flowing. *You must be suspecting something is not quite right by now*
++
+image::04-t2-grafana-empty.png[]
+* Leave the 'Grafana' dahsboard in your browser and proceed to the next task.
 
 
-. Go to istio-system and have a look at the SMCP
-. The SM Components wha are they, what do they offer, how do I find them?
-. Login to Kiali and watch nothing
-. Login to Jaeger and watch nothing
+. Login to `Kiali` to view a visualisation of the _Travel Agency_ solution in the mesh:
+* Follow the link to the `Kiali` URL, login with username/password and 
+* Fom the left hand side menu select _Graph_ and from the _Namespace_ drop-down menu (top) choose the `Select All` option.
+* Notice, again there is no Graph visualisation of any service _Travel Agency_ solution:
++
+image::05-t2-kiali-empty.png[]
+
+* Leave the 'Kiali' dahsboard in your browser and proceed to the next task.
+
+IMPORTANT: Why can I not see my services?
 
 
+## Task 3: Add the _Travel Agency_ Virtual Machines & Containers to the mesh
 
-## Task 2: Enable your VM to be part of the mesh and connect to cloud native components
+If it was not apparent until now, service mesh is capable to only apply policies (security, observability etc.) only to those deployed components that are part of the mesh. In order to enable this the following 2 actions are required and neither requires a change in the original software.
 
-. Add the 3 namespaces to the Mesh - SMMR (**NOTE:** maybe this script updates all other VMs/containers with the sidecar annotation and restarts them)
+. Add the 3 namespaces of _Travel Agency_ to the Mesh - SMMR (**NOTE:** maybe this script updates all other VMs/containers with the sidecar annotation and restarts them).
+[source,yaml,subs=attributes]
+----
+oc apply -f 1-servicemeshmember.yaml
+----
+
+. Add the an `envoy` sidecar (namely the `istio-proxy` container) to a service mesh project.
+* The following actions inserts the annotation `sidecar.istio.io/inject` to the `POD` of each component and restarts the POD so that the mesh action of inject the `istio-proxy` container and start applying the policies takes effect.
+[source,yaml,subs=attributes]
+----
+ACTION TO BE DEFINED
+./2-add-travel-portal-to-mesh.sh
+./3-deploy-travel-portal-domain.sh
+./4-deploy-travel-services-domain.sh
+----
 
 
-. Add the VM to a service mesh project
+## Task 4: Validate that the _Travel Agency_ Virtual Machines are part of the mesh
 
-* Add the applications to the Mesh - istio injection
-* Restart the apps - 
+Lets validate now that the actions taken has successfully placed the _Travel Agency_ components (Virtual Machines and containers) in the mesh and you have started to take advantage of the added on offered capabilities so that the VMs can be elevated with cloud native capabilities.
+
+. Back in the `Kiali` screen in your browser:
+* From the _Namespace_ drop-down menu (top) choose the `Select All` option (you should now have 4 namespaces that include the 3 _Travel Agency_ namespaces we added to the mesh).
+* In the _3rd_ drop-down menu (top) make sure  the `Versioned App Graph` option is selected.
+* Now you should see the whole network of microservices (VMs and containers) making up the solution, as follows which includes the VMs in `travel-agency` namespace side-by-side with the container based deployments in `travel-portal`.
++
+image::06-t2-ossm-travel-agency.png[]
+
+Perform the following actions in order to understand how OpenShift Service Mesh has already added functionality to the solution without having to perform any re-implementation of the VMs:
+
+. Check that traffic is secured with exchange of certificates (Mutual TLS (MTLS)) 
+* From the _Display_ dropdown select the option `Security`,
+* The _lock_ icon indicates that the traffic is mTLS protected with certificates injected and used in the handshake,
+* Click on the arrow between `viaggi v1` (container based deployment) and `travels-vm` (vm based deployment),
+* Notice on the right-hand side that indeed the traffic is _mTLS_ enabled and the principals used are shown.
++
+image::07-t2-mtls-enabled.png[]
+* You can go ahead and try the traffic animation, traffic rate and other options of the display.
+
+
 
 . Validate everything in the observability stack
 
 * Kiali - mtls, graph, traffic distribution, 
++
+WARNING: TRAFFIC SEEMS TO BE CONSIDERED TCP so no headers with additional traffic info/trace span
+
 * Tracing console
++
+WARNING: TRAFFIC SEEMS TO BE CONSIDERED TCP so no headers with additional traffic info/trace span
+
 * Istio metrics captured in OCP observability stack
++
+TODO
+
 * Grafana
++
+WARNING: Mesh dasboard doesn't have our services listed
 
+. Test the service
+
+* Route fails
+** Why?
 **Bonus Point: ** Why is the travel-dashboard not accessible? Maybe as fun point we get 10 t-shirts and in each module we get them to **think** and first 10 ppl that answer the questions correctly get the t-shirts. Can we get budget or from OCP Virt / Mesh BUs to provide the t-shirts?
+* Lets execute a request for Travel in a manual manner
+** Send a request for a flight to London
+ [source,yaml,subs=attributes]
+----
+curl http://hotels-vm.travel-agency.cluster.local:8000/hotels/Rome
+----
 
+** Send a request for hotels in Rome
 
-
+[source,yaml,subs=attributes]
+----
+curl http://hotels-vm.travel-agency.cluster.local:8000/hotels/Rome
+----
 
 
 
