@@ -13,7 +13,7 @@ This set of labs is all about giving you the ability to go beyond understanding 
 
 Today you will experience these added capabilities through OpenShift tooling that will enable you to elevate the capabilities of your migrated Virtual Machines to be on par with containerised Cloud Native applications already.
 
- You will experience  how you can take advantage the tools that come with OpenShift such as:
+You will experience  how you can take advantage the tools that come with OpenShift such as:
 
 * Kubernetes - container orchestration
 * Prometheus - monitoring & analysis

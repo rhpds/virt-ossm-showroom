@@ -10,14 +10,41 @@
 
 # (REMOVE) Hands-On - Technical Steps
 
+Moving Virtual Machines into OpenShift enabled you to expose and scale the applications running within through the configuration of a `Service` controller resulting in a loadbalancer called that routes the traffic to all instances of the Virtual Machines. However, the ease with which this is possible results in added complexity when creating appropriate ring-fencing around access rights to a Virtual Machine, level of throughput, monitoring of the traffic load it receives, releasing new versions of it and providing resillience.
+
+image::OSSM-ServiceMesh.png[]
+
+OpenShift comes with Service Mesh which is an add-on service layer added to assist in solving 4 main use cases in the Cloud Native world:
+
+. Security
+. Traffic Management
+. Observability
+. Resilliene & Error Handling
+
+Lets see how a Virtual Machine can take advantage of this service.
+
 ## Task 1: Explore what the OpenShift Service Mesh world is and what it offers
+
+Firstly, lets explore a few of the components of Service Mesh as it will offer clarity on the results of the activities you will undertake in the follow-up sections.
+
+image::OSSM-Components.png[]
+
+OpenShift Service Mesh is delivered as part of the platform through an operator which is a specialised program to deliver the mesh components. These include:
+
+* *istiod*: a component that will apply all your defined policies (security, traffic management etc.) in the network of Virtual Machines or containers included in the mesh.
+* *envoy*: a component that enhances your Virtual Machines with the ability to read and apply the policies.
+* *Kiali*: an observability component which visualises what is configured in the mesh, the network of included applications and a host of other visualisation capabilities:
+* The rest of the observbility components (as seen in the image above) contain parts of what _kiali_ visualises eg. metrics, traces etc.
+
+
+
 
 . Go to istio-system and have a look at the SMCP
 . The SM Components wha are they, what do they offer, how do I find them?
 . Login to Kiali and watch nothing
 . Login to Jaeger and watch nothing
 
-Task 1: 
+
 
 ## Task 2: Enable your VM to be part of the mesh and connect to cloud native components
 
