@@ -1,0 +1,34 @@
+#  Lab Introduction
+
+Welcome to the lab *{lab_name}.*
+
+In this lab you are working as *{openshift_cluster_user_name}*.
+
+## Objectives
+
+* Understand the lab setup
+* Understand the application context
+
+## Lab assets
+
+//Before you begin, access your link:https://codeserver-codeserver-{openshift_cluster_user_name}.{openshift_cluster_ingress_domain}[code-server environment,window=_blank] and ensure you have access to the lab assets `ossm-labs`.
+
+// Open a terminal (*`Terminal`* -> *`New Terminal`* from the menu) in the _code-server_ so that you can execute the commands during the labs.
+
+You have a terminal on your right hand side with all the lab assets cloned form the Git repo: link:https://github.com/rhpds/virt-ossm-workspace[virt-ossm-workspace,window=_blank]. List your current directory and see if all the assets are available:
+
+[source,shell,subs=attributes,role=execute]
+----
+ls -la
+----
+
+You can go and inspect these resources in this repository at a later stage.
+
+//Although for the labs the assets are made available you can additionally get and inspect these resources at a later stage from the link:https://github.com/redhat-gpte-devopsautomation/ossm-labs[ossm-labs,window=_blank] github repository.
+
+## Openshift Cluster Environment
+
+[IMPORTANT]
+====
+You will be using a *dedicated OpenShift cluster with OpenShift Virtualization, OpenShift Service Mesh and other components already installed*. In this lab you are going to explore and leverage these services, not going to install them.
+====

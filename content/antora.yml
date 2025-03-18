@@ -4,6 +4,7 @@ version: main
 
 
 nav:
+  - modules/intro/nav.adoc
   - modules/m1/nav.adoc
   - modules/m2/nav.adoc
   - modules/m3/nav.adoc

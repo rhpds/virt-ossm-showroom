@@ -1,0 +1,5 @@
+# Lab Introduction
+
+## Congratulations on completing this module!
+
+Continue now to _Module 1 - Explore OpenShift Virtualization and connect the virtual machines_ 
