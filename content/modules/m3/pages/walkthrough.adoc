@@ -110,62 +110,53 @@ ACTION TO BE DEFINED
 
 Lets validate now that the actions taken has successfully placed the _Travel Agency_ components (Virtual Machines and containers) in the mesh and you have started to take advantage of the added on offered capabilities so that the VMs can be elevated with cloud native capabilities.
 
-. Back in the `Kiali` screen in your browser:
-* From the _Namespace_ drop-down menu (top) choose the `Select All` option (you should now have 4 namespaces that include the 3 _Travel Agency_ namespaces we added to the mesh).
-* In the _3rd_ drop-down menu (top) make sure  the `Versioned App Graph` option is selected.
-* Now you should see the whole network of microservices (VMs and containers) making up the solution, as follows which includes the VMs in `travel-agency` namespace side-by-side with the container based deployments in `travel-portal`.
+. Back in the `Kiali` screen, in the _Namespace_ drop-down menu (top) choose the `Select All` option (you should now have 4 namespaces that include the 3 _Travel Agency_ namespaces we added to the mesh) amd in the _3rd_ drop-down menu (top) make sure  the `Versioned App Graph` option is selected. Now you should see the whole network of microservices (VMs and containers) making up the solution (the VMs in `travel-agency`,  `travel-control` namespaces side-by-side with the container based deployments in `travel-portal`).
 +
 image::06-t2-ossm-travel-agency.png[]
-
-Perform the following actions in order to understand how OpenShift Service Mesh has already added functionality to the solution without having to perform any re-implementation of the VMs:
-
-. Check that traffic is secured with exchange of certificates (Mutual TLS (MTLS)) 
-* From the _Display_ dropdown select the option `Security`,
-* The _lock_ icon indicates that the traffic is mTLS protected with certificates injected and used in the handshake,
-* Click on the arrow between `viaggi v1` (container based deployment) and `travels-vm` (vm based deployment),
-* Notice on the right-hand side that indeed the traffic is _mTLS_ enabled and the principals used are shown.
 +
-image::07-t2-mtls-enabled.png[]
-* You can go ahead and try the traffic animation, traffic rate and other options of the display.
-
-
-
-. Validate everything in the observability stack
-
-* Kiali - mtls, graph, traffic distribution, 
+Perform the following actions in order to understand how OpenShift Service Mesh has already added functionality to the solution without having to perform any re-implementation of the VMs.
 +
-WARNING: TRAFFIC SEEMS TO BE CONSIDERED TCP so no headers with additional traffic info/trace span
 
-* Tracing console
+
+. Awesome job! Lets now validate everything in the _Travel Agency_ using the observability tools you have already seen.
+
+
+* In `Kiali` you can follow the guidance below, revealing the traffic secured with certificates as well as review the throughput, rate and distribution of the traffic into your VMs.
 +
-WARNING: TRAFFIC SEEMS TO BE CONSIDERED TCP so no headers with additional traffic info/trace span
+image::07-t2-kiali-graph-validation.gif[]
 
-* Istio metrics captured in OCP observability stack
+* The solution has been enhanced with metrics so that you can use to check the _throughput size_ and _latency_ in/out of the Virtual Machine as well as success or failure error codes. Follow the review on the _travels-vm_ of the guide below in your own `Kiali` UI showing you the inbound/outbound traffic metrics.
 +
-TODO
+image::08-t2-kiali-metrics.gif[]
 
-* Grafana
+* The Virtual Machines did not get altered but you are already getting a whole new experience. Look in the `Jaeger` Tracing console (per the following guide) which now contains traces of 
+** the traffic in/out of the Virtual Machines 
+** showing both successful and failed traced requests
+** the services the request traverses, 
+** the time it takes in each step 
+** whether the request was a success or a failure. 
 +
-WARNING: Mesh dasboard doesn't have our services listed
+image::09-t2-jaeger-tracing.gif[]
++
 
-. Test the service
 
-* Route fails
-** Why?
-**Bonus Point: ** Why is the travel-dashboard not accessible? Maybe as fun point we get 10 t-shirts and in each module we get them to **think** and first 10 ppl that answer the questions correctly get the t-shirts. Can we get budget or from OCP Virt / Mesh BUs to provide the t-shirts?
+* Finally, the Grafana dashboards (_Istio Mesh Dashboard_) have been populated with information about the solution that you can use to undertand the healthiness, content and usage of the solution.
++
+image::10-t2-grafana-mesh-dashboard-with-data.png[Istio Mesh Dashboard]
++
+
+
+. Testing the service
+
+* Using the Travel Agency UI URL Fails https://travel-dashboard-travel-control.apps.cluster-szndb.dynamic.redhatworkshops.io/ fails. 
+** **Bonus Points: ** Why is the travel-dashboard not accessible? Maybe as fun point we get 10 t-shirts and in each module we get them to **think** and first 10 ppl that answer the questions correctly get the t-shirts. Can we get budget or from OCP Virt / Mesh BUs to provide the t-shirts?
 * Lets execute a request for Travel in a manual manner
-** Send a request for a flight to London
- [source,yaml,subs=attributes]
-----
-curl http://hotels-vm.travel-agency.cluster.local:8000/hotels/Rome
-----
-
-** Send a request for hotels in Rome
+** Lets check for a flight to London
 
 [source,yaml,subs=attributes]
 ----
-curl http://hotels-vm.travel-agency.cluster.local:8000/hotels/Rome
+oc exec $(oc get po -l app=hotels-vm|awk '{print $1}'|tail -n 1) -- curl -s hotels-vm.travel-agency.svc.cluster.local:8000/hotels/London
 ----
 
 
-
+NOTE: As you use the tooling consider the new abilities and features they have presented you with whilst you did not have to change the original VM configuration.
