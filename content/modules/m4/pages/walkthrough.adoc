@@ -1,0 +1,50 @@
+# Module 4: Integrating VMs with OpenShift Service Mesh for Ressilience, Release Engineering and Authorisation 
+
+## Task 1: Allow traffic to flow into the VMs
+
+In a traditional environment firewall rules, loadbalancers etc. have to be configured in order to give access to the application in a Virtual Machine. Having enabled the VMs to be part of the mesh it is now in your hand to expose one or more of the services to the outside world.
+
+In this task we will exposed the _Travel Agency_ UI via the mesh _Ingress Gateway_, which as we saw in the previous module is the Service Mesh component used control incoming traffic. Open the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/. As we have not exposed anything you will not see the page being served. To achieve this you will create the following _Custom Resources (CRs)_  (https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/expose-control-vm.sh[inspect script expose-control-vm.sh]):
+
+* https://istio.io/latest/docs/reference/config/networking/gateway/[`Gateway`]: A load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections
+
+* https://istio.io/latest/docs/reference/config/networking/virtual-service/[`VirtaulService`]: Affects traffic routing including traffic separation (multiple versions, context based etc.).
+
+* https://istio.io/latest/docs/reference/config/networking/destination-rule/[`DestinationRule`]: Defines policies (loadbalancing, retries, failover, security) that apply to traffic intended for a service after routing has occurred.
+
+[source,yaml,subs=attributes]
+----
+./expose-control-vm.sh
+----
+
+Refresh the the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/ and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
+
+After a brief time the `Kiali` also shows the traffic flowing in as per the following guide.
+
+image::ingress-control.gif[]
+
+## Task 2: Allow traffic to flow into the VMs
+
+* Define VirtualServices and DestinationRules for traffic routing/weights etc. to the scaled out VM in SM
+
+## Task 3: Retries and Timeouts
+
+* Define Istio DestinationRules for retries and timeouts
+* Inject errors
+
+## Task 3: Circuit Breakers
+
+* Implement circuit breakers to prevent cascading failures
+* Inject errors
+
+
+## Task 3: Restrict visibility with business rules
+
+* Authz policies (apply denyall and then allow specific)  (from this)
+
+
+## Objectives
+
+* Enable mutual TLS for VM-to-container communication
+
+
