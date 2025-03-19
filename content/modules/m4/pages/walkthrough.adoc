@@ -1,10 +1,10 @@
 # Module 4: Integrating VMs with OpenShift Service Mesh for Ressilience, Release Engineering and Authorisation 
 
-## Task 1: Allow traffic to flow into the VMs
+## Task 1: Expose VMs to public requests
 
-In a traditional environment firewall rules, loadbalancers etc. have to be configured in order to give access to the application in a Virtual Machine. Having enabled the VMs to be part of the mesh it is now in your hand to expose one or more of the services to the outside world.
+You have deployed and secured the _Travel Agency_ solution but noone can access it which is not sitting well with the business team, you need to act fast sales walks out! In a traditional environment this would require to talk to various teams, open tickets for firewall rules, loadbalancers etc. to allow access to your Virtual Machine. Lucky that your these are now running in an environment that is part of the Service Mesh and it is now in your hand to expose one or more of the services to the outside world.
 
-In this task we will exposed the _Travel Agency_ UI via the mesh _Ingress Gateway_, which as we saw in the previous module is the Service Mesh component used control incoming traffic. Open the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/. As we have not exposed anything you will not see the page being served. To achieve this you will create the following _Custom Resources (CRs)_  (https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/expose-control-vm.sh[inspect script expose-control-vm.sh]):
+Exposed the _Travel Agency_ UI via the mesh _Ingress Gateway_, which as we saw in the previous module is the Service Mesh component used to control incoming traffic. Open the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/. As we have not exposed anything you will not see the page being served. To achieve this you will create the following _Custom Resources (CRs)_  (https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/expose-control-vm.sh[inspect script expose-control-vm.sh]):
 
 * https://istio.io/latest/docs/reference/config/networking/gateway/[`Gateway`]: A load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections
 
@@ -17,26 +17,61 @@ In this task we will exposed the _Travel Agency_ UI via the mesh _Ingress Gatewa
 ./expose-control-vm.sh
 ----
 
-Refresh the the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/ and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
+Refresh the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/ and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
 
 After a brief time the `Kiali` also shows the traffic flowing in as per the following guide.
 
 image::ingress-control.gif[]
 
-## Task 2: Allow traffic to flow into the VMs
+## Task 2: Release multiple versios
 
-* Define VirtualServices and DestinationRules for traffic routing/weights etc. to the scaled out VM in SM
+Whilst you were busy exposing the solution to the whole wide world business and engineering got together into a war room, defined requirements and released a new version of the `cars` service named `cars-vm-v2`. They need your help to release it before lunch time when new customers will be ordering cars and allow `10%`` of new customers to access the service. If all goes well increse the traffic to this new service to `70%``.
 
-## Task 3: Retries and Timeouts
+In order to achieve this you will:
+
+a. Deploy a new Virtual Machine `cars-vm-v2` with `version=v2` (see https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/cars-vm-v2.yaml[cars-vm-v2.yaml])
+b. Define a `DestinationRule` which will direct traffic destined for the `cars-vm` service in both `v1` and `v2` VMs based on their `version=v??` label (see https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/multipleversions-for-car-vm-in-the-mesh.sh#L30-L36[multipleversions-for-car-vm-in-the-mesh.sh]).
+c. Define a `VirtualService` which allows `90%` of the traffic to `v1` and `10%` to the new `cars-vm-v2`.
+
+Execute the following script which performs the actions giving `90%` traffic to `v1`.
+
+[source,yaml,subs=attributes]
+----
+./multipleversions-for-car-vm-in-the-mesh.sh 90 10
+----
+
+You can see the result of the traffic split in the `Kiali` console as per the following guidance.
+
+image::separate-v1-v2-traffic.gif[]
+
+After you have verified the new version is stable go ahead and increase traffic to it at `70%`
+
+[source,yaml,subs=attributes]
+----
+./multipleversions-for-car-vm-in-the-mesh.sh 30 70
+----
+
+The config in `Kiali` has been updated (see https://kiali-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/console/namespaces/travel-agency/istio/virtualservices/cars[cars `VirtualService`]) and soon the graph should show `70%` traffic flowing to `V2`. 
+
+## Task 4: Retries and Timeouts
+
+* Inject errors
+
+oc apply -f fault-vs.yaml -n travel-agency
 
 * Define Istio DestinationRules for retries and timeouts
-* Inject errors
+
+
+
+
 
 ## Task 3: Circuit Breakers
 
 * Implement circuit breakers to prevent cascading failures
 * Inject errors
 
+oc apply -f cars-vm-v2-no-sidecar.yaml 
+oc delete pods -l vm.kubevirt.io/name=cars-vm-v2 -n travel-agency
 
 ## Task 3: Restrict visibility with business rules
 
