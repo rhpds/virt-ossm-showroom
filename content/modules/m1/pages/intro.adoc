@@ -1,4 +1,45 @@
-.Module 1 - Introduction to modernizing VMs on OpenShift
+# Module 1 - Explore OpenShift Virtualization and connect the virtual machines
 
+This set of labs is all about giving you the ability to go beyond understanding and using OpenShift as another platform of running Virtual Machines. We want you to actually make them first class citizens in a Cloud Native World. But, what is `Cloud Native` really and why should you care?
 In this set of lab scenarios we will explore how one can elevate the operation capabilities of a Virtual Machine based application once it is migrated in the OpenShift Containers Platform.
+
+## Objectives
+
+* Understand the goals of modernizing VMs on OpenShift
+* Review the key OpenShift features to enhance VM capabilities
+* Understand Kubernetes services vor VMs
+* Use of Kubernetes network policies
+* Do a VM live migration
+
+## Cloud Native is Patterns (CNCF)
+
+* *Availability* -> Microservices & Netflix for everyone
+* *Automation* ->  Deployment & Management
+* *Acceleration* -> CI/CD & “the ABCDE” of automation
+* *Anywhere!* ->  Containers are portable
+
+## Patterns need Tools 
+
+Today you will experience these added capabilities through OpenShift tooling that will enable you to elevate the capabilities of your migrated Virtual Machines to be on par with containerised Cloud Native applications already.
+
+You will experience  how you can take advantage the tools that come with OpenShift such as:
+
+* Kubernetes - container orchestration
+* Prometheus - monitoring & analysis
+* OpenTracing - tracing interop
+* Service mesh - traffic management, security, observability and resillience
+* GitOps - declarative configuration, deployment automation and recovery
+
+## About OpenShift Virtualization
+
+OpenShift Virtualization provides the scalable, enterprise-grade virtualization functionality in Red Hat OpenShift. You can use it to manage virtual machines (VMs) exclusively or alongside container workloads.
+
+OpenShift Virtualization adds new objects into your OpenShift Container Platform cluster by using Kubernetes custom resources to enable virtualization tasks. These tasks include:
+
+* Creating and managing Linux and Windows VMs
+* Running pod and VM workloads alongside each other in a cluster
+* Connecting to VMs through a variety of consoles and CLI tools
+* Importing and cloning existing VMs
+* Managing network interface controllers and storage disks attached to VMs
+* Live migrating VMs between nodes
 

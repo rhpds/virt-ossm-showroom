@@ -1,4 +1,4 @@
-# Module 1 - Introduction to modernizing VMs on OpenShift
+# Module 1 - Explore OpenShift Virtualization and connect the virtual machines
 
 ## Congratulations on completing this module!
 
