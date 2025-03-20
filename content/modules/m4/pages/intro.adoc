@@ -2,15 +2,13 @@
 
 ## ABOUT THIS LAB
 
-In this lab scenario you will explore how you can enable access to the outside worls into your VMs, ensuring that your VM based solution can recover the failure of a VM without having to managet that yourself and releasing new version of your components..  
+In this lab scenario you will explore how you can further make the solution secure and robust whilst accessible to the outside world into your VMs is readmitted. You will be ensuring that your VM based solution can recover from failures of a VM without having to managet that yourself and releasing new version of your components.
 
 
 ## Objectives
 
-* Allow traffic to flow in via ServiceMesh (Gateway/VirtualService for Control VM) - gw ingress configuration
-* Define VirtualServices and DestinationRules for traffic routing/weights etc. to the scaled out VM in SM
-* Enable mutual TLS for VM-to-container communication
-* Authz policies (apply denyall and then allow specific)  (from this)
-* Define Istio DestinationRules for retries and timeouts
-* Implement circuit breakers to prevent cascading failures
+* Expose Virtual Machines for public consumption via Service Mesh ingress gateway.
+* Release a new version of a Virtual Machine, run it in parallel to the original and define % of traffic to flow to each.
+* Create policies with the help of Service Mesh to exclude instances of your Virtual Machines when they are unresponsive in order to ensure any failures do not impact end-user requests.
+* Apply restrictions for business and security purposes via authorization policies.
 
