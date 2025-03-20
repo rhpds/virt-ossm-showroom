@@ -1,0 +1,405 @@
+# Module 2 - Scaling Virtual Machines on OpenShift
+
+## Task 1: Complete the Travel Demo Application - Create the UI component 
+
+Let us revisit the application architecture.
+As of now all backend services are running as virtual machines in the `travel-agency` namespace.
+In the `travel-portal` namespace we have three Customer Portals running in the form of containers.
+
+What is missing, is the _business dashboard_ (Simulator) in the `travel-control` namespace.
+This component provides an UI and simulates sending booking requests to the booking portals.
+We are going to deploy this component now as a virtual machine.
+
+image::intro:TravelDemo.png[400,1000]
+
+First we create a new OpenShift project (namespace) for this Virtual machine:
+
+[,sh,subs="attributes",role=execute]
+----
+oc new-project travel-control
+----
+
+Then go to *Virtualization -> VirtualMachines -> Create*
+
+Select `With YAML` and replace the content with the following:
+
+[,yaml,subs="attributes",role=execute]
+----
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: control-vm
+  namespace: travel-control
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        creationTimestamp: null
+        name: fedora-control
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: fedora
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  running: true
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: small
+        vm.kubevirt.io/os: fedora
+        vm.kubevirt.io/workload: server
+#        sidecar.istio.io/inject: 'true'
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: control-vm
+        kubevirt.io/size: small
+        app: control-vm
+        version: v1
+    spec:
+      architecture: amd64
+      domain:
+        cpu:
+          cores: 1
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+          rng: {}
+        features:
+          acpi: {}
+          smm:
+            enabled: true
+        firmware:
+          bootloader:
+            efi: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+        memory:
+          guest: 2Gi
+        resources: {}
+      networks:
+        - name: default
+          pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - dataVolume:
+            name: fedora-control
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: ukqo-2vq4-xdjf
+              chpasswd: { expire: False }
+              ssh_pwauth: true
+              runcmd:
+              - loginctl enable-linger fedora
+              - su - fedora -c 'XDG_RUNTIME_DIR=/run/user/$(id -u) DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user daemon-reload'
+              - su - fedora -c 'XDG_RUNTIME_DIR=/run/user/$(id -u) DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user start control.service'
+              write_files:
+              - content: |
+                  [Unit]
+                  Description=Fedora Control Container
+
+                  [Container]
+                  Label=app=control-container
+                  ContainerName=control-container
+                  Image=quay.io/kiali/demo_travels_control:v1
+                  Environment=PORTAL_SERVICES='voyages.fr;http://voyages.travel-portal.svc.cluster.local:8000,viaggi.it;http://viaggi.travel-portal.svc.cluster.local:8000,travels.uk;http://travels.travel-portal.svc.cluster.local:8000'
+                  PodmanArgs=-p 8080:8080
+
+                  [Install]
+                  WantedBy=multi-user.target default.target
+
+                  [Service]
+                  Restart=always
+                path: /etc/containers/systemd/users/control.container
+                permissions: '0777'
+                owner: root:root
+          name: cloudinitdisk
+----
+
+Click on *Create*.
+
+The Virtual Machine instance is going to be provisioned now.
+After a minute or two, the VM should be up and running:
+
+image::vm-control-running.png[]
+
+## Task 2: Expose the Business Dashboard
+
+The _business dashboard_ is running and sending booking request to the booking portals. 
+In order to access the UI of the Dashboard from our Browser, we have to create a Kubernetes Service and expose this Service with an OpenShift Route, like we did in Module 1.
+
+First create the Kubernetes services:
+
+[,yaml,subs="attributes"]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: control-vm
+  namespace: travel-control
+  labels:
+    app: control-vm
+spec:
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    kubevirt.io/domain: control-vm
+----
+
+[,sh,subs="attributes",role=execute]
+----
+oc apply -f ./control-svc.yaml
+----
+
+Now expose the service with a route:
+
+[,yaml,subs="attributes"]
+----
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: travel-control
+  namespace: travel-control
+spec:
+  to:
+    kind: Service
+    name: control-vm
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+  wildcardPolicy: None
+----
+
+[,sh,subs="attributes",role=execute]
+----
+oc apply -f ./control-route.yaml
+----
+
+You can access the dashboard now through https or http...
+
+Go to *Networking -> Routes* and click on the URL in the *Location* column.
+
+image::route.png[]
+
+Or use the CLI to get the URL:
+
+[,sh,subs="attributes",role=execute]
+----
+echo "$(oc get route travel-control -o jsonpath='{.spec.host}' -n travel-control)"
+----
+
+Open the Dashboard and explore the features. 
+You can now adjust the settings (Request Ratio, Travel Type etc.) of each travel portal by using the sliders. 
+
+image::travel-dashboard.png[]
+
+*Congratulations!!*
+You helped the Travel Agency company to have their complete Booking system running in OpenShift with VMs alongside containers.
+
+## Scaling the Travel Booking Application
+
+Kubernetes pods and virtual machines (VMs) follow different scaling mechanisms due to their architectural differences.
+
+### Scaling Kubernetes Pods
+
+Kubernetes manages stateless and stateful applications using pods, which are lightweight and designed for rapid scaling.
+
+*Horizontal Scaling (Out/In):*
+Kubernetes scales pods dynamically based on CPU, memory, or custom metrics using the Horizontal Pod Autoscaler (HPA).
+Example: If CPU usage exceeds a threshold, Kubernetes creates more pod replicas automatically.
+Pods can be distributed across multiple nodes for load balancing.
+
+*Vertical Scaling (Up/Down):*
+Pods can request more CPU/memory via the Vertical Pod Autoscaler (VPA), though restarting may be required.
+Pods are ephemeral, meaning they can be replaced without losing data, making them ideal for cloud-native applications.
+
+### Scaling Virtual Machines
+
+OpenShift Virtualization enables Kubernetes to manage virtual machines (VMs), which have persistent states and require more resources than pods.
+
+*Horizontal Scaling:*
+Instead of HPA, OpenShift Virtualization uses `VirtualMachineInstanceReplicaSet (VMIRS)` to scale VMs by creating multiple instances.
+Load balancers can distribute traffic among VMs.
+
+*Vertical Scaling:*
+VMs can be scaled up by increasing CPU, memory, or disk resources.
+Unlike pods, live migration can be used to move VMs to nodes with sufficient resources.
+
+## Task 3: Scale up the control-vm
+
+The _busines dashboard_ is the central UI component in the Travel Booking application.
+Therefore we want to increase the cpu and memory.
+The VM instance is currently configured with 1 cpu and 2GB of memory. 
+Let us validate this.
+
+Got to *Virtualization -> VirtualMachines -> control-vm*
+
+Click on the *Console* tab and login to the VM.
+In the terminal please type:
+
+[,sh,subs="attributes",role=execute]
+----
+lscpu
+----
+
+You should see something similar to this:
+
+image::lscpu.png[]
+
+[,sh,subs="attributes",role=execute]
+----
+free
+----
+
+image::free-memory.png[]
+
+Now click on the *Configuration* tab, scroll down and click on `CPU | Memory`
+
+image::increase-resources.png[]
+
+Select 2 vCPU and 4GB of Memory and click on *Save*. 
+
+Now we see that the VM has pending changes. In order to get the changes applied, we need to restart the VM.
+
+image::pending-changes.png[]
+
+Click on the top right dropdown menu *Actions -> Restart*
+
+After the VM is restarted, log back in and check the cpu and memory.
+
+OpenShift Virtualization also supprts Live Migration when increasing resources, so it can migrate VMs across nodes for better resource utilization. The underlying node must have enough available resources for scaling up.
+
+*Congratulations*!
+You have scaled up a Virtual Machine.
+
+## Task 4: Scale out a VM to showcase the loadbalancing ability in OCP
+
+Different options here:
+
+* Manually scale by adding new VMs with the same Label 
+* Using VirtualMachinePools (Dev preview)
+* Using VirtualMachineInstanceReplicaSet (not supported)
+
+Example:
+
+[,YAML,subs="attributes",role=execute]
+----
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstanceReplicaSet
+metadata:
+  name: travel-control-vm-replicaset
+  namespace: travel-control
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      kubevirt.io/domain: control-vm
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: small
+        vm.kubevirt.io/os: fedora
+        vm.kubevirt.io/workload: server
+#        sidecar.istio.io/inject: 'true'
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: control-vm
+        kubevirt.io/size: small
+        app: control-vm
+        version: v1
+    spec:
+      architecture: amd64
+      domain:
+        cpu:
+          cores: 1
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              name: default
+          rng: {}
+        features:
+          acpi: {}
+          smm:
+            enabled: true
+        firmware:
+          bootloader:
+            efi: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+        memory:
+          guest: 2Gi
+        resources: {}
+      networks:
+        - name: default
+          pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - dataVolume:
+            name: fedora-control
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: ukqo-2vq4-xdjf
+              chpasswd: { expire: False }
+              ssh_pwauth: true
+              runcmd:
+              - [ sudo, systemctl, daemon-reload ]
+              - [ sudo, systemctl, start, control.service ]
+              write_files:
+              - content: |
+                  [Unit]
+                  Description=Fedora Control Container
+
+                  [Container]
+                  Label=app=control-container
+                  ContainerName=control-container
+                  Image=quay.io/kiali/demo_travels_control:v1
+                  Environment=PORTAL_SERVICES='voyages.fr;http://voyages.travel-portal.svc.cluster.local:8000,viaggi.it;http://viaggi.travel-portal.svc.cluster.local:8000,travels.uk;http://travels.travel-portal.svc.cluster.local:8000'
+                  PodmanArgs=-p 8080:8080
+
+                  [Install]
+                  WantedBy=multi-user.target default.target
+
+                  [Service]
+                  Restart=always
+                path: /etc/containers/systemd/users/control.container
+                permissions: '0777'
+                owner: root:root
+          name: cloudinitdisk
+
+----
+
+## Task 5: Live Migration of a VM
+

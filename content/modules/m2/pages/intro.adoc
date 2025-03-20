@@ -1,0 +1,28 @@
+## Module 2 - Scaling Virtual Machines on OpenShift
+
+In this module we are going to finish setting up the Travel Application demo.
+And we are exploring the scaling options for Virtual Machines in OpenShift.
+
+## Objectives
+
+* Complete the Travel Application Demo
+* Scaling up Virtual Machines
+* Scaling out Virtual Machines
+
+## About Scaling of Virtual Machines
+
+OpenShift Virtualization extends Kubernetes by allowing it to manage virtual machines (VMs) alongside containers. Scaling with OpenShift Virtualization can be approached in two ways:
+
+### Scaling Up (Vertical Scaling)
+
+Scaling up involves increasing the resources (CPU, memory, storage) allocated to a VM. 
+This is useful when a single VM requires more power instead of distributing the workload across multiple instances.
+
+You can modify VM Resources by editing a VirtualMachine (VM) specification to increase CPU and memory resources.
+
+### Scaling Out (Horizontal Scaling)
+
+Scaling out means adding more VM instances to distribute the workload. 
+This is useful for workloads that need high availability or load balancing.
+
+We can use a Horizontal Pod Autoscaler (HPA) Alternative: Since Kubernetes HPA is designed for pods, we can use KubeVirt VirtualMachineInstances (VMI) ReplicaSets.

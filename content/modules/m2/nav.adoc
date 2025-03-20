@@ -1,4 +1,4 @@
-.Module 2 - Deploying Virtual Machines on OpenShift
+.Module 2 - Scaling Virtual Machines on OpenShift
 * xref:intro.adoc[Introduction]
 * xref:walkthrough.adoc[Walkthrough]
 * xref:finish.adoc[Finish]
