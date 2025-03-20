@@ -8,49 +8,23 @@
 * Connect VMs to the Service Mesh **WARNING** this cannot be predone because it give a network issue where VM pods cannot connect to each other due to sidecar. **HOW WILL WE TRIGGER THIS SO THEY DON'T HAVE TO DO ALL VMS?**
 
 
-# (REMOVE) Hands-On - Technical Steps
 
-Moving Virtual Machines into OpenShift enabled you to expose and scale the applications running within through the configuration of a `Service` controller resulting in a loadbalancer called that routes the traffic to all instances of the Virtual Machines. However, the ease with which this is possible results in added complexity when creating appropriate ring-fencing around access rights to a Virtual Machine, level of throughput, monitoring of the traffic load it receives, releasing new versions of it and providing resillience.
-
-image::01-OSSM-ServiceMesh.png[]
-
-OpenShift comes with Service Mesh which is an add-on service layer which assist in solving 4 main use cases in the Cloud Native world:
-
-. Security
-. Traffic Management
-. Observability
-. Resilliene & Error Handling
-
-The administrators have already done the setup of Service Mesh so lets see how easy it is to enable a a Virtual Machine to take advantage of these new capabilities.
-
-## Task 1: Explore what the OpenShift Service Mesh world is and what it offers
-
-Firstly, lets explore a few of the components of Service Mesh as it will offer clarity on the results of the activities you will undertake in the follow-up sections.
-
-image::02-OSSM-Components.png[]
-
-OpenShift Service Mesh is delivered as part of the platform through an operator which is a specialised program to deliver the mesh runtime components. These include:
-
-* *istiod*: a component that will apply all your defined policies (security, traffic management etc.) in the network of Virtual Machines and containers included in the mesh.
-* *envoy*: a component that enhances your Virtual Machines with the ability to read and apply the policies and effectively makes your Virtual Machine part of the mesh. The envoy sits next to your Virtual Machine (see the image above) and intercepts all requests coming in and out of it.
-* *Kiali*: an observability component which visualises what is configured in the mesh, the network of included applications, the traffic throughut/latency, the security utilised and a host of other visualisation capabilities.
-* The rest of the observbility components (as seen in the image above) contain parts of what _kiali_ visualises eg. metrics, traces etc.
-* *Gatewas*: one or more ingress gateway components are made available to allow traffic flowing into mesh included services from the outside as the mesh comes with network policies that disable direct access to them and an egress gateway respectively can allow outgoing traffic from the mesh to external services.
+Migrating _Virtual Machines_ into OpenShift enabled you to expose and scale the applications running within through the configuration of a `Service` controller resulting in a loadbalancer that routes the traffic to all instances of the _Virtual Machines_. However, the ease with which this is possible results in added complexity. Creating appropriate ring-fencing policies around access rights to a _Virtual Machine_, the allowed throughput, monitoring of the traffic load it receives, reacting to faults, releasing new versions of it and providing resillience are some of the features OpenShift Service Mesh can help with. Lets start using them
 
 
-## Task 2: Access the Observability Stack
 
-Remember one of the capabilities the service mesh adds is to enhance OpenShift and deployed components observability without the need for the applications within the Virtual Machines to be altered. 
+## Task 1: Access the Observability Stack
+
+The first feature you will explore is the ability to enhance mesh included applicationswith added observability without the need for the applications within the _Virtual Machines_ to be altered. 
 
 Lets find the URLs of the observability components by executing the following commands in your terminal.
 
-NOTE: The service mesh components have been installed by the platform team in the `istio-system` namespace.
+NOTE: The service mesh components have been installed by the platform team in the `istio-system` namespace. You can go to project `istio-system` and then access via `Networking` menu from the left and then go to `Routes` for the components below as well.
 
 [source,yaml,subs=attributes]
 ----
 echo "http://$(oc get route kiali -o jsonpath='{.spec.host}' -n istio-system)"
 echo "https://$(oc get route jaeger -o jsonpath='{.spec.host}' -n istio-system)"
-echo "https://$(oc get route prometheus -o jsonpath='{.spec.host}' -n istio-system)"
 echo "https://$(oc get route grafana -o jsonpath='{.spec.host}' -n istio-system)"
 
 ----
