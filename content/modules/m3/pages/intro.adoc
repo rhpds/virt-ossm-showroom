@@ -1,11 +1,36 @@
-# Module 3: Enhancing Networking with OpenShift Service Mesh (OSSM)
+# Module 3: Enhancing Networking & Observability with OpenShift Service Mesh (OSSM)
 
 ## ABOUT THIS LAB
 
-In this lab scenario you will explore added features OpenShift has on offer to elevate the experience of operating and monitoring Virtual Machines as first class citizens in the cloud native world.  
+In this lab scenario you will explore added features of OpenShift, through the OpenShift Service Mesh add-on service, to elevate the experience of operating and monitoring _Virtual Machines_ as first class citizens in a cloud native world.  
 
 
 ## Objectives
 
 * Integrate Virtual Machines with OpenShift Service Mesh for advanced networking
 * Implement traffic management and observability features
+
+
+## About OpenShift Service Mesh
+
+image::01-OSSM-ServiceMesh.png[]
+
+OpenShift comes with https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Service Mesh] which is an add-on service layer aimed at providing features to enhance the platform capabilities in 4 main use cases for Cloud Native applications:
+
+. Security
+. Traffic Management
+. Observability
+. Resilliene & Error Handling
+
+
+image::02-OSSM-Components.png[]
+
+OpenShift Service Mesh is delivered as part of the platform through an operator, which is a specialised program, to deliver the mesh runtime components. Lets explore the main components of Service Mesh as it will offer clarity on the results of the activities you will undertake in the follow-up sections:
+
+* *istiod*: a component that will apply all your defined policies (encryption, authorization, traffic management, observability) in the network of _Virtual Machines_ and containers included in the mesh.
+* *envoy*: a component that enhances your _Virtual Machines_ with the ability to read and apply the policies and effectively makes your Virtual Machine part of the mesh. The envoy sits next to your Virtual Machine (see the image above) and intercepts all requests coming in and out of it.
+* *Kiali*: an observability component which visualises what is configured in the mesh, the network of included applications, the traffic throughut/latency, the security utilised and a host of other visualisation capabilities.
+* The rest of the observbility components (as seen in the image above) contain parts of what _kiali_ visualises eg. `Prometheus` collects the _metrics_ emitted by the `envoy` of each container/VM in the mesh, `Jaeger` collects _traces_ of each container/VM in the mesh and draws a path (`span`) of microservices a request traversed showing the time the request spent in each microservice and success/failure state, `Grafana` provides additional dashboards for the operators and business analysts to review on performance, request throughput/latency, success/failures etc.
+* *Gateways*: one or more `ingress gateway`` components are made available to allow traffic flowing into service mesh from the outside. This is required since the mesh comes with `network policies`` that disable direct access to VMs/containers in the mesh. Also an egress gateway respectively can allow outgoing traffic from the mesh to external services.
+
+The administrators have already done the setup of Service Mesh so lets see how easy it is to enable a a Virtual Machine to take advantage of these new capabilities.
