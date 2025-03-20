@@ -1,4 +1,4 @@
-# Module 4: Integrating VMs with OpenShift Service Mesh for Security, Ressilience, New Flows
+# Module 4: Resilience, Scalability and Fault Aversion for VMs in a Cloud Native manner
 
 ## ABOUT THIS LAB
 
