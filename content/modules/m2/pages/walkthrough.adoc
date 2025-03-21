@@ -239,7 +239,12 @@ Pods are ephemeral, meaning they can be replaced without losing data, making the
 OpenShift Virtualization enables Kubernetes to manage virtual machines (VMs), which have persistent states and require more resources than pods.
 
 *Horizontal Scaling:*
-Instead of HPA, OpenShift Virtualization uses `VirtualMachineInstanceReplicaSet (VMIRS)` to scale VMs by creating multiple instances.
+In general there are 3 options to scale out Virtual Machines with OpenShift Virtualization:
+
+* Adding additional VMs manually (or with GitOps)
+* Using a `VirtualMachineInstanceReplicaSet` resource (Not officialy supported)
+* Using a `VirtualMachinePool` resource (Dev Preview feature)
+
 Load balancers can distribute traffic among VMs.
 
 *Vertical Scaling:*
@@ -295,111 +300,162 @@ You have scaled up a Virtual Machine.
 
 ## Task 4: Scale out a VM to showcase the loadbalancing ability in OCP
 
-Different options here:
+As we have mentioned already, there are three options to scale out VMs.
+We are going to use a `VirtualMachinePool` resource in this task.
 
-* Manually scale by adding new VMs with the same Label 
-* Using VirtualMachinePools (Dev preview)
-* Using VirtualMachineInstanceReplicaSet (not supported)
+[NOTE]
+====
+Please note that `VirtualMachinePool` is a Dev Preview feature of OpenShift Virtualization
+====
 
-Example:
+A VirtualMachinePool tries to ensure that a specified number of VirtualMachine replicas and their respective VirtualMachineInstances are in the ready state at any time. In other words, a VirtualMachinePool makes sure that a VirtualMachine or a set of VirtualMachines is always up and ready.
 
-[,YAML,subs="attributes",role=execute]
+We are going to delete the existing `control-vm` Virtual Machine and replace it with this `VirtualMachinePool` configuration:
+
+[,YAML,subs="attributes",]
 ----
-apiVersion: kubevirt.io/v1
-kind: VirtualMachineInstanceReplicaSet
+apiVersion: pool.kubevirt.io/v1alpha1
+kind: VirtualMachinePool
 metadata:
-  name: travel-control-vm-replicaset
+  name: travel-control-vm-pool
   namespace: travel-control
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       kubevirt.io/domain: control-vm
-  template:
+  virtualMachineTemplate:
     metadata:
       annotations:
         vm.kubevirt.io/flavor: small
         vm.kubevirt.io/os: fedora
         vm.kubevirt.io/workload: server
 #        sidecar.istio.io/inject: 'true'
-      creationTimestamp: null
       labels:
         kubevirt.io/domain: control-vm
         kubevirt.io/size: small
         app: control-vm
         version: v1
     spec:
-      architecture: amd64
-      domain:
-        cpu:
-          cores: 1
-          sockets: 1
-          threads: 1
-        devices:
-          disks:
-            - disk:
-                bus: virtio
-              name: rootdisk
-            - disk:
-                bus: virtio
-              name: cloudinitdisk
-          interfaces:
-            - masquerade: {}
-              name: default
-          rng: {}
-        features:
-          acpi: {}
-          smm:
-            enabled: true
-        firmware:
-          bootloader:
-            efi: {}
-        machine:
-          type: pc-q35-rhel9.4.0
-        memory:
-          guest: 2Gi
-        resources: {}
-      networks:
-        - name: default
-          pod: {}
-      terminationGracePeriodSeconds: 180
-      volumes:
-        - dataVolume:
-            name: fedora-control
-          name: rootdisk
-        - cloudInitNoCloud:
-            userData: |-
-              #cloud-config
-              user: fedora
-              password: ukqo-2vq4-xdjf
-              chpasswd: { expire: False }
-              ssh_pwauth: true
-              runcmd:
-              - [ sudo, systemctl, daemon-reload ]
-              - [ sudo, systemctl, start, control.service ]
-              write_files:
-              - content: |
-                  [Unit]
-                  Description=Fedora Control Container
+      runStrategy: Always
+      dataVolumeTemplates:
+      - apiVersion: cdi.kubevirt.io/v1beta1
+        kind: DataVolume
+        metadata:
+          creationTimestamp: null
+          name: fedora-control
+        spec:
+          sourceRef:
+            kind: DataSource
+            name: fedora
+            namespace: openshift-virtualization-os-images
+          storage:
+            resources:
+              requests:
+                storage: 30Gi
+      template:     
+        metadata:
+          annotations:
+            vm.kubevirt.io/flavor: small
+            vm.kubevirt.io/os: fedora
+            vm.kubevirt.io/workload: server
+    #        sidecar.istio.io/inject: 'true'
+          labels:
+            kubevirt.io/domain: control-vm
+            kubevirt.io/size: small
+            app: control-vm
+            version: v1
+        spec:     
+          architecture: amd64
+          domain:
+            cpu:
+              cores: 1
+              sockets: 1
+              threads: 1
+            devices:
+              disks:
+                - disk:
+                    bus: virtio
+                  name: rootdisk
+                - disk:
+                    bus: virtio
+                  name: cloudinitdisk
+              interfaces:
+                - masquerade: {}
+                  name: default
+              rng: {}
+            features:
+              acpi: {}
+              smm:
+                enabled: true
+            firmware:
+              bootloader:
+                efi: {}
+            machine:
+              type: pc-q35-rhel9.4.0
+            memory:
+              guest: 2Gi
+            resources: {}
+          networks:
+            - name: default
+              pod: {}
+          terminationGracePeriodSeconds: 180
+          volumes:
+          - dataVolume:
+              name: fedora-control
+            name: rootdisk
+          - cloudInitNoCloud:
+              userData: |-
+                #cloud-config
+                user: fedora
+                password: ukqo-2vq4-xdjf
+                chpasswd: { expire: False }
+                ssh_pwauth: true
+                runcmd:
+                - loginctl enable-linger fedora
+                - su - fedora -c 'XDG_RUNTIME_DIR=/run/user/$(id -u) DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user daemon-reload'
+                - su - fedora -c 'XDG_RUNTIME_DIR=/run/user/$(id -u) DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus" systemctl --user start control.service'
+                write_files:
+                - content: |
+                    [Unit]
+                    Description=Fedora Control Container
 
-                  [Container]
-                  Label=app=control-container
-                  ContainerName=control-container
-                  Image=quay.io/kiali/demo_travels_control:v1
-                  Environment=PORTAL_SERVICES='voyages.fr;http://voyages.travel-portal.svc.cluster.local:8000,viaggi.it;http://viaggi.travel-portal.svc.cluster.local:8000,travels.uk;http://travels.travel-portal.svc.cluster.local:8000'
-                  PodmanArgs=-p 8080:8080
+                    [Container]
+                    Label=app=control-container
+                    ContainerName=control-container
+                    Image=quay.io/kiali/demo_travels_control:v1
+                    Environment=PORTAL_SERVICES='voyages.fr;http://voyages.travel-portal.svc.cluster.local:8000,viaggi.it;http://viaggi.travel-portal.svc.cluster.local:8000,travels.uk;http://travels.travel-portal.svc.cluster.local:8000'
+                    PodmanArgs=-p 8080:8080
 
-                  [Install]
-                  WantedBy=multi-user.target default.target
+                    [Install]
+                    WantedBy=multi-user.target default.target
 
-                  [Service]
-                  Restart=always
-                path: /etc/containers/systemd/users/control.container
-                permissions: '0777'
-                owner: root:root
-          name: cloudinitdisk
-
+                    [Service]
+                    Restart=always
+                  path: /etc/containers/systemd/users/control.container
+                  permissions: '0777'
+                  owner: root:root
+            name: cloudinitdisk
 ----
+
+Now let's apply this configuration:
+
+[,sh,subs="attributes",role=execute]
+----
+oc apply -f ./vm-pool.yaml
+----
+
+Go to *Virtualization -> VirtualMachines* in the `travel-control` namespace and you should see two instances of the control-vm running.
+
+image::vm-pool.png[]
+
+Select one of the VMs and delete it!
+
+image::delete-vm.png[200,400]
+
+Open the _business dashboard_ and validate that it is still working.
+
+You will also recognize that the control-vm is *automatically recreated*.
 
 ## Task 5: Live Migration of a VM
 
