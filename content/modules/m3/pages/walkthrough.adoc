@@ -1,13 +1,5 @@
 # Module 3: Enhancing Networking with OpenShift Service Mesh (OSSM)
 
-# (REMOVE) Prerequisites - Technical Steps 
-
-* Deploy OpenShift Service Mesh
-* Install the OSSM operator
-* Configure an Istio control plane
-* Connect VMs to the Service Mesh **WARNING** this cannot be predone because it give a network issue where VM pods cannot connect to each other due to sidecar. **HOW WILL WE TRIGGER THIS SO THEY DON'T HAVE TO DO ALL VMS?**
-
-
 ## Task 1: Access the Observability Stack
 
 The first feature of Service Mesh you will explore is the ability to enhance mesh included applications with added observability amd without the need for the applications within the Virtual Machines to be altered. 
