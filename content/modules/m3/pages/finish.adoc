@@ -2,7 +2,7 @@
 
 ## Congratulations on completing this module!
 
-You have already experienced the ease with which a VM can be enhanced with features of cross-cutting concern (security, observability) in a clout native world. 
+You have already experienced the ease with which a VM can be enhanced with features of cross-cutting concern (security, observability) in a cloud native world. 
 
-In the next scenario you will be going further by configuring resilliency, fault-tolerance and automation of managing multiple versions of your applications.
+In the next scenario you will be going further by configuring resilliency, fault-tolerance and automation of deploying and managing multiple versions of your Virtual Machines.
 

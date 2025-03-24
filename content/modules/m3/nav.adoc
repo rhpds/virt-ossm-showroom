@@ -1,4 +1,4 @@
-.Module 3 - 
+.Module 3: Enhancing Networking with OpenShift Service Mesh (OSSM)
 * xref:intro.adoc[Introduction]
 * xref:walkthrough.adoc[Walkthrough]
 * xref:finish.adoc[Finish]
