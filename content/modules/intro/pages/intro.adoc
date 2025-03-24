@@ -2,7 +2,7 @@
 
 Welcome to the lab *{lab_name}.*
 
-In this lab you are working as *{openshift_cluster_user_name}*.
+In this lab you are working as *{openshift_cluster_admin_username}*.
 
 ## Objectives
 

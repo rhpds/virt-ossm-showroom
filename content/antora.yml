@@ -16,6 +16,7 @@ start_page: intro:intro.adoc
 
 asciidoc:
   attributes:
+    lab_name: OpenShift Virtualization with Service Mesh and GitOps
     openshift_api_url: https://api.cluster-guid.guid.sandbox.opentlc.com:6443
     openshift_cluster_ingress_domain: apps.cluster-guid.guid.sandbox.opentlc.com
     openshift_cluster_console_url: https://console-openshift-console.apps.cluster-guid.guid.sandbox.opentlc.com
