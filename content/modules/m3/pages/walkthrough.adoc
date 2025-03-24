@@ -2,9 +2,9 @@
 
 ## Task 1: Access the Observability Stack
 
-The first feature of Service Mesh you will explore is the ability to enhance mesh included applications with added observability amd without the need for the applications within the Virtual Machines to be altered. 
+The first feature of Service Mesh you will explore is the ability to enhance mesh included applications with additional observability traits while maintaining the applications within the Virtual Machines unchanged. 
 
-Lets find the URLs of the observability components by executing the following commands in your terminal.
+Find the URLs for the service mesh observability components by executing the following commands in your terminal.
 
 [,sh,subs="attributes",role=execute]
 ----
@@ -13,42 +13,42 @@ echo "https://$(oc get route jaeger -o jsonpath='{.spec.host}' -n istio-system)"
 echo "https://$(oc get route grafana -o jsonpath='{.spec.host}' -n istio-system)"
 ----
 
-NOTE: The service mesh components have been installed by the platform team in the `istio-system` namespace. Alternatively, you can go to project `istio-system` in the OpenShift console and find the observability URLS at the *Networking -> Routes* menu from the left.
+NOTE: The service mesh components have been installed by the platform team in the `istio-system` namespace, therefore at the *Networking -> Routes* menu in the OpenShift console in project `istio-system` you will also find the observability URLs.
 
-. First Login to the `Jaeger` dashboard to check the traffic traces for the _Travel Agency_ solution:
-+
+Login to the `Jaeger` dashboard to check the traffic traces for the _Travel Agency_ solution.
+
 image::02-jaeger-login.gif[]
-+
-* Open the link to the Jaeger URL (*Login with OpenShift* using the credentials (*${openshift_cluster_admin_username}/${openshift_cluster_admin_password}*). At  `Authorize Access` page select `Allow selected permissions`).
-* The `Jaeger` dashboard shows traces captured by the mesh of the traffic flowing between components that are part of the mesh. Whilst the `Service` drop down list offers to select the service that traffic is originating 
-* Currently, you should see there are no services listed. *Challenge: Can you figure out based on the information provided in Task 1 why that is?*
-+
-image::03-t2-jaeger-empty.png[]
-* Leave the `Jaeger` dahsboard open in your browser as we will come back to it a little later and lets explore the next observability tool.
 
-. Lets now access the `Grafana` dashboard:
-* Follow the link to the `Grafana` URL login with *${openshift_cluster_admin_username}/${openshift_cluster_admin_password}*.
-* From the left menu follow *Dashboards → Browse → Istio → Istio Mesh Dashboard* to access the `Grafana`` dashboard that shows the services in the mesh, traffic volume towards them as well as HTTP codes of sucess failure of the requests.
-* You should see again there are no services listed or traffic flowing. *You must be suspecting something is not quite right by now. Can you point your finger where the problem is?*
-+
+Open the link to the Jaeger URL (*Login with OpenShift* using the credentials (*${openshift_cluster_admin_username}/${openshift_cluster_admin_password}*). At  `Authorize Access` page select `Allow selected permissions`). The `Jaeger` console shows traces of the traffic flowing between components that are part of the mesh. A `Service` drop down list offers to select the service that traffic is originating from.
+
+Currently, you should see there are no services listed. *Challenge: Can you figure out based on the information provided in the introduction section why that is?*
+
+image::03-t2-jaeger-empty.png[]
+
+Leave the `Jaeger` dahsboard open in your browser as we will come back to it a little later and lets explore the next observability tool.
+
+Access the `Grafana` dashboard by following the link to the `Grafana` URL. Login with *${openshift_cluster_admin_username}/${openshift_cluster_admin_password}* and at the left menu follow *Dashboards → Browse → Istio → Istio Mesh Dashboard* to access the `Grafana` dashboard that shows the services in the mesh, the traffic volume they receive as well as HTTP codes of sucess or failure of the requests.
+
+You should see again there are no services listed or traffic flowing. *You must be suspecting something is not quite right by now. Can you point your finger where the problem is?*
+
 image::04-t2-grafana-empty.png[]
 
-* Service Mesh has precreated a few dashboards under *Dashboards → Browse → Istio* to monitoring of both the dataplane (Virtual Machines, containers) as well as controlplane (the istio components) of the mesh.
-* Leave the `Grafana` dahsboard open in your browser as we will come back to it a little later and lets explore `Kiali`.
+Service Mesh has precreated a few dashboards under *Dashboards → Browse → Istio* to assist in monitoring both the dataplane (Virtual Machines, containers) as well as controlplane (the istio components) of the mesh.
+
+Leave the `Grafana` dahsboard open in your browser as we will come back to it a little later and lets explore `Kiali`.
 
 
-. Login to `Kiali` to view a visualisation of the _Travel Agency_ solution in the mesh:
-* Follow the link to the `Kiali` URL, login with *${openshift_cluster_admin_username}/${openshift_cluster_admin_password}* and 
-* Fom the left hand side menu select _Graph_ and from the _Namespace_ drop-down menu (top) choose the `Select All` option.
-* Notice, again there is no Graph visualisation of any service _Travel Agency_ solution:
-+
+Access `Kiali` to view a visualisation of the _Travel Agency_ solution in the mesh. The link to the `Kiali` URL will present you with a login (use *${openshift_cluster_admin_username}/${openshift_cluster_admin_password}*). Once logged in at the left hand side menu select _Graph_ and choose the `Select All` option of the _Namespace_ drop-down menu (top).
+
+NOTE: Again there is no Graph visualisation of any service _Travel Agency_ solution:
+
 image::05-t2-kiali-empty.png[]
 
-* Leave the 'Kiali' dahsboard in your browser and proceed to the next task.
+Leave the `Kiali` dahsboard in your browser and proceed to the next task.
 
 IMPORTANT: Why can I not see my services?
 
-You have now been successful accessing and exploring the additional observability tools delivered by service mesh you would not get from the default OpenShift observability stack.  
+*Despite the lack of data you have been successfull!* You have now successfully accessed and explored the additional observability tools delivered by service mesh you would not get from the default OpenShift observability stack.  
 
 
 ## Task 2: Add the _Travel Agency_ Virtual Machines & Containers to the mesh
@@ -89,9 +89,11 @@ image::06-2-containers.gif[]
 
 Back in the `Kiali` screen we are now able to visualise information about the mesh included _Travel Agency_. 
 
-IMPORTANT: However, `Kiali` will give you a lot more than just visualisation of the network, you can review the applied mesh configurations, modify them and apply new ones. Lets see what further information you can extract with it.
+TIP: However, `Kiali` will give you a lot more than just visualisation of the network, you can review the applied mesh configurations, modify them and apply new ones. Lets see what further information you can extract with it.
 
 With the *Select All* option, from the *Select Namespace* drop-down menu (at the top), you should now see the 3 _Travel Agency_ namespaces listed. The `Versioned App Graph` should result in the whole network of microservices (VMs and containers) being displayed and interacting (the VMs in `travel-agency`,  `travel-control` namespaces side-by-side with the container based deployments in `travel-portal`).
+
+IMPORTANT: Wow this is trully brilliant. Containers and VMs working side by side within the platform and the mesh is integrating them without distinguishing on the technology of their runtime.
 
 image::06-t2-ossm-travel-agency.gif[]
 
@@ -99,9 +101,9 @@ image::06-t2-ossm-travel-agency.gif[]
 
 NOTE: You can carry on viewing the network in real-time however `Kiali` also has *Replay* features and you can find the replay icon image:07-t2-kiali-replay.png[] next to the *Last 1 minute* (the default duration of the network display period). Explore the additional ability these features give you to look at the state of the network at an earlier time selecting different options.
 
-Firstly, explore the default _security_ configurations the mesh has already applied. In the *Graph* go to the *Display (drop down) -> Security*. This reveals through the *lock icon* that all communications have now been encrypted via a mesh generated and rotated certificate. Click on the line connecting the *travels v1* service to *travels vm* and notice on the right hand-side menu under *mTLS Enabled* it shows the principals in the _spiffe_ certificates exchanged. *Just like that* we have ensured no man in the middle loophole!!
+You can go beyond the basic visualization to explore the default _security_ configurations the mesh has already applied. In the *Graph* go to the *Display (drop down) -> Security*. This reveals through the *lock icon* that all communications have now been encrypted via a mesh generated and rotated certificate. Click on the line connecting the *travels v1* service to *travels vm* and notice on the right hand-side menu under *mTLS Enabled* it shows the principals in the _spiffe_ certificates exchanged. *Just like that* we have ensured no man in the middle loophole!!
 
-Furthermore, the *Display* menu gives you the ability to visualise the *% of Traffic Distribution*, *Throughput request/response*, *Response Time (by percentile)*. Go ahead and use these options to explore the information as the following animated guide also shows.
+But, that is not all: The *Display* menu gives you the ability to visualise the *% of Traffic Distribution*, *Throughput request/response*, *Response Time (by percentile)*. Go ahead and use these options to explore the information as the following animated guide also shows.
 
 image::07-t2-kiali-graph-validation.gif[]
 
@@ -109,7 +111,7 @@ It is obvious now that the mesh is by default also capturing network metrics of 
 
 image::08-t2-kiali-metrics.gif[]
 
-Finally, as we said earlier `Kiali` enables the operator to also manage mesh configurations. Go to *Istio Config -> Namespace (drop down) -> Select all travel-xxx namespaces*. You should see there are no custom added configurations as we have not yet started to configure the mesh with additional _authorization_, _traffic_ or _resillience_ mesh configurations. Select instead *Istio Config -> Namespace (drop down) -> istio-system* and now you will see the default ones added by the mesh. Explore the *default* https://istio.io/latest/docs/reference/config/networking/destination-rule/[`DestinationRule`] (by clicking the link on the name of the configuration), as also shown by the animated guide below this configuration enforces *ISTIO_MUTUAL TLS* policy to all destinations with `*.cluster.local` service name suffix and this includes all the services you created in *_Module 1_*. If you wish you could change this policy here in `Kiali`, this would affect the encryption between components in the mesh (if you do please revert it before continuing).
+Finally, as we said earlier `Kiali` enables the operator to also manage mesh configurations. Go to *Istio Config -> Namespace (drop down) -> Select all travel-xxx namespaces*. You should see there are no custom added configurations as we have not yet started to configure the mesh with additional _authorization_, _traffic_ or _resillience_ mesh configurations. Select instead *Istio Config -> Namespace (drop down) -> istio-system* and now you will see the default ones added by the mesh. Explore the *default* https://istio.io/latest/docs/reference/config/networking/destination-rule/[`DestinationRule`] (by clicking the link on the name of the configuration), as also shown by the animated guide below this configuration enforces *ISTIO_MUTUAL TLS* policy to all destinations with `$$*$$.cluster.local` service name suffix and this includes all the services you created in *_Module 1_*. If you wish you could change this policy here in `Kiali`, this would affect the encryption between components in the mesh (if you do please revert it before continuing).
 
 image::07-t2-kiali-configs.gif[]
 
@@ -118,7 +120,7 @@ We shall explore https://istio.io/latest/docs/reference/config/networking/destin
 
 NOTE: Take a moment to pause and reflect on what has happened! The change of annotating the `VirtualMachine` OpenShift resource with `sidecar.istio.io/inject` has achieved all this. The Virtual Machines did not get altered but you are already getting a whole new experience. 
 
-Lets now look back in the `Jaeger` Tracing console which now contains traces of the requests. From the services menu select the *travels-vm.portal* and click *Find Traces*. By default you will receive the last _20 Traces_ captured in the _last hour_ but you can increase that up to _1500 Traces_ as well as configure the time this was captured at from the menu. The console displays a top-level overview of:
+Lets now look back in the `Jaeger` Tracing console which now contains traces of the requests. From the services menu select the *travels-vm.portal* and click *Find Traces*. By default you will receive the last _20 Traces_ captured in the _last hour_ but you can increase that to up to _1500 Traces_ as well as configure the time these were captured at from the menu. The console displays a top-level overview of:
 
 * the requests in/out of the Virtual Machine (each _dot_ in the graph and each *Trace* line entry below represent a request passing through the *travels-vm.portal*)
 * showing both successful and failed traced requests (a _blue dot_ indicates a successful request, a _red dot_ a failed one)
@@ -152,7 +154,7 @@ Access the _Travel Agency_ dashboard https://travel-dashboard-travel-control.app
 
 TIP: You will need to https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/service_mesh/index#ossm-routing-ingress_traffic-management[configure the mesh which included services are allowed to be exposed]. We will perform this in the next module.
 
-Since, the user interface is not accessible verify the solution through service-to-service communications (always though intercepted by the mesh). Request for a travel quote from `travels` in the travel-portal to `travels-vm` in the 'travel-agency' namespace:
+Since, the user interface is not accessible verify the solution through service-to-service communications (always though intercepted by the mesh). Request for a travel quote from `travels` in the travel-portal to `travels-vm` in the `travel-agency` namespace:
 
 [,sh,subs="attributes",role=execute]
 ----
