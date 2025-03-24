@@ -1,4 +1,4 @@
-.Module 4 - 
+.Module 4: Resilience, Scalability and Fault Aversion for VMs in a Cloud Native manner 
 * xref:intro.adoc[Introduction]
 * xref:walkthrough.adoc[Walkthrough]
 * xref:finish.adoc[Finish]

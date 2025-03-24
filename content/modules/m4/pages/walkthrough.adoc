@@ -1,97 +1,155 @@
-# Module 4: Integrating VMs with OpenShift Service Mesh for Ressilience, Release Engineering and Authorisation 
+# Module 4: Resilience, Scalability and Fault Aversion for VMs in a Cloud Native manner
+
 
 ## Task 1: Expose VMs to public requests
 
-You have deployed and secured the _Travel Agency_ solution but noone can access it which is not sitting well with the business team, you need to act fast before sales drop! In a traditional environment this would require to open tickets for firewall rules, loadbalancers, external DNS etc. to allow access to your _Virtual Machine_. In such an environment networking can be defined between OpenShift and Service Mesh and it is now in your hands to expose one or more of the services to the outside world.
+You have deployed and secured the _Travel Agency_ solution but noone can access it. In a traditional environment to allow access you would need to open tickets for firewall rules, loadbalancers, external DNS etc. however in the current environment networking can be defined between OpenShift and Service Mesh.
 
-Exposed the _Travel Agency_ UI via the mesh _Ingress Gateway_, which as we saw in the previous module is the Service Mesh component used to control incoming traffic. Open the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/ in your  browser. As you have not exposed anything you will not see the page being served. To achieve this you will create the following _Custom Resources (CRs)_  (https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/expose-control-vm.sh[inspect script expose-control-vm.sh]):
+Lets expose the _Travel Agency_ dashboard to the outside world via the mesh _Ingress Gateway_ (extensive information is provided in the https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/service_mesh/index#ossm-routing-traffic[Managing traffic in your service mesh] documentation) which as we have already seen is the Service Mesh component used to control incoming traffic. 
+
+Open the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/ in your  browser. As we have not exposed any services from the mesh yet you will not see the page being served. To achieve this you will create the following _Custom Resources (CRs)_ :
 
 * https://istio.io/latest/docs/reference/config/networking/gateway/[`Gateway`]: A load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections.
 
-* https://istio.io/latest/docs/reference/config/networking/virtual-service/[`VirtaulService`]: Defines traffic routing including traffic separation (multiple versions, context based etc.).
+* https://istio.io/latest/docs/reference/config/networking/virtual-service/[`VirtualService`]: Defines traffic routing including traffic separation (multiple versions, context based etc.).
 
 * https://istio.io/latest/docs/reference/config/networking/destination-rule/[`DestinationRule`]: Defines policies (loadbalancing, retries, failover, security) that apply to traffic intended for a service after routing has occurred.
 
-Execute the following script to deploy these configurations:
+Execute script https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/expose-control-vm.sh[expose-control-vm.sh] to deploy these configurations:
 [source,yaml,subs=attributes]
 ----
-./expose-control-vm.sh
+./expose-control-vm.sh apps.cluster-brdbs.dynamic.redhatworkshops.io
 ----
 
-Refresh the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/ and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
+Refresh the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.cluster-brdbs.dynamic.redhatworkshops.io and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
 
-After a brief time the `Kiali` also shows the traffic flowing in as per the following guide.
+After a brief time the `Kiali` also shows the traffic flowing via the `istio-ingressgateway` towards the `control-vm`.
 
 image::01-m4-t1-ingress-control.gif[]
 
-## Task 2: Release new versions of a _Virtual Machine_ application
+## Task 2: Perform a Canary Release of a new versions of a _Virtual Machine_ application
 
-Whilst you were busy exposing the solution to the whole wide world business and engineering got together into a war room, defined requirements and released a new version of the `cars` service named `cars-vm-v2`. They need your help to release it before lunch time when new customers will be ordering cars and allow `10%` of new customers to access the service. If all goes well increse the traffic to this new service to `80%`.
+Often you will be required to deploy and maintain multiple versions of an application to provide new features to a subset of customers. In this occasion you awill be releasing *v2* of the *cars-vm* allowing *10%* of new customer requests to access the new service whilst the remainder will continue to go to *v1*. If all goes well you will increase the traffic to *v2* to *80%*.
 
-In order to achieve this you will:
+In order to achieve this you are going to first deploy a new Virtual Machine `cars-vm-v2-a` with `version=v2` (see https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/cars-vm-v2-a.yaml[cars-vm-v2-a.yaml]).
 
-a. Deploy a new Virtual Machine `cars-vm-v2-a` with `version=v2` (see https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/cars-vm-v2-a.yaml[cars-vm-v2-a.yaml])
-b. Define a `DestinationRule` which will direct traffic destined for the `cars-vm` service in both `v1` and `v2` VMs based on their `version=v??` label (see https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/multipleversions-for-car-vm-in-the-mesh.sh#L30-L36[multipleversions-for-car-vm-in-the-mesh.sh]).
-c. Define a `VirtualService` which allows `90%` of the traffic to `v1` and `10%` to the new `cars-vm-v2`.
-
-Execute the following script which performs the above actions utilising Service Mesh *cars* `VirtualService` to apply `weight` to route `90%` of the traffic to `v1`.
+Then you need to configure the mesh traffic as through a `DestinationRule` which will direct traffic destined for the `cars-vm` service to both `v1` and `v2` VMs based on their `version=v??` label (see https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/multipleversions-for-car-vm-in-the-mesh.sh#L30-L36[multipleversions-for-car-vm-in-the-mesh.sh]).
 
 [source,yaml,subs=attributes]
+----
+kind: DestinationRule
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: cars
+  namespace: travel-agency
+  labels:
+    module: m4
+spec:
+  host: cars-vm.travel-agency.svc.cluster.local
+  subsets:
+    - labels:
+        version: v1
+      name: v1
+    - labels:
+        version: v2
+      name: v2
+----
+
+Finally define a `VirtualService` which allows `90%` of the traffic to reach `v1` and `10%` to the new `cars-vm-v2-a`.
+
+[source,yaml,subs=attributes]
+----
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: cars
+  namespace: travel-agency
+  labels:
+    module: m4
+spec:
+  hosts:
+    - cars-vm.travel-agency.svc.cluster.local
+  gateways:
+    - mesh
+  http:
+    - route:
+        - destination:
+            host: cars-vm.travel-agency.svc.cluster.local
+            subset: v1
+          weight: 90
+        - destination:
+            host: cars-vm.travel-agency.svc.cluster.local
+            subset: v2
+          weight: 10
+----
+
+NOTE: We deliver the above via the attached terminal but you could as easily have used the `Kiali` consile to configure them
+
+Execute the script which performs the above actions utilising Service Mesh *cars* `VirtualService` to apply a `weight` of *90* in order to route`90%` of the traffic to `v1`.
+
+[,sh,subs="attributes",role=execute]
 ----
 ./multipleversions-for-car-vm-in-the-mesh.sh 90 10
 ----
 
-You can see the result of the traffic split in the `Kiali` console as the following animated guide also shows.
+`Kiali` *Istio Config* will now list under `travel-agency` the new traffic management configurations.
+
+image::01-m4-t1-kiali-config.png[]
+
+
+Shortly after creating the traffic configuration you will start seeing the result of the traffic split in the `Kiali` console as the following animated guide also shows.
 
 image::02-m4-t2-separate-v1-v2-traffic.gif[]
 
 After you have verified the new version is stable go ahead and increase traffic routing for `v2` to `80%`.
 
-[source,yaml,subs=attributes]
+[,sh,subs="attributes",role=execute]
 ----
 ./multipleversions-for-car-vm-in-the-mesh.sh 20 80
 ----
 
-The config in `Kiali` has been updated (see https://kiali-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/console/namespaces/travel-agency/istio/virtualservices/cars[cars `VirtualService`]) and soon the graph should show `80%` traffic flowing to `v2`. 
+The config in `Kiali` has been updated (see https://kiali-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/console/namespaces/travel-agency/istio/virtualservices/cars[cars `VirtualService`]) and soon the graph should show `80%` traffic flowing to `v2`. 
 
 ## Task 3: Circuit Breakers
 
-The new metrics visualisation has enabled the business team to project a 50% increase in traffic to the newly released `v2` service of `cars-vm-v2` for that reason they have asked you to:
+The new metrics visualisation can enable business teams to understand the level of load the solution receives and make appropriate operational decisions. In order to cater for a 50% increase in traffic to the newly released `v2` service of `cars-vm-v2` configure the solution in the mesh so that:
 
-* double the service capacity,
-* guarantee high availability of the `cars-vm` service, and
+* you double the service capacity,
+* guarantee high availability of requests to the `cars-vm` service, and
 * ensure any failures do not impact end-user requests.
 
-In response you will perform the following actions taking advantage of both OpensShift and Service Mesh capabilities:
+Service mesh as we have already seen provides the capability for traffic management in order additionally offer resillience you are going to also take advantage of the https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[_circuit breaker_] feature of the mesh.
 
-a. Deploy a new _Virtual Machine_ https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`] that will also be exposed as part of `cars-vm` service (as are `cars-vm` and `cars-vm-v2-a`)
-b. Label it for traffic destined by Service Mesh for `v2` workloads of the `cars-vm` service and hence making requestes towards `v2` hightly available between 2 _Virtual Machines_.
-c. Configure a https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[_circuit breaker_] so that if there is a problem on either of the 2 `v2` _Virtual Machines_ the Service Mesh will stop directing traffic to it until it has recovered.
+First deploy an additional _Virtual Machine_ https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`] that will also be exposed as part of `cars-vm` service (together with `cars-vm` and `cars-vm-v2-a`). You will also label with version *v2* hence making requestes towards *v2* hightly available between the `cars-vm-v2-a` and `cars-vm-v2-b` _Virtual Machines_.
 
-Execute the following to deploy now the new _Virtual Machine_  https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`] 
+Once the VM is up and running configure a https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[_circuit breaker_] in the mesh so that if there is a problem on either of the 2 *version=v2* _Virtual Machines_ the service mesh will stop directing traffic to it until it has recovered.
 
-[source,yaml,subs=attributes]
+Execute the following to deploy the new _Virtual Machine_  https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`].
+
+[,sh,subs="attributes",role=execute]
 ----
 oc apply -f cars-vm-v2-b.yaml -n travel-agency
 ----
 
-After deploying the new `cars-vm-v2-b` VM you should notice in `Kiali` that `cars-vm` has now 3 destinations and traffic destined for `v2` will be split almost equally at `40%` between the `v2` instances.
+After deploying the new `cars-vm-v2-b` VM you should notice in `Kiali` that `cars-vm` has now 3 destinations and traffic destined for `v2` will be split almost equally at `40%` between the `v2` instances. *Congratulations* you have achieved high availability for requests on *version=v2*. It was not so difficult after all!!
 
 image::03-m4-t3-2-v2-endpoints.png[]
 
 
-Next, in order to protect the end user from a failures to one of the `v2` VMs you will implement with Service Mesh a https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[circuit breaker], an important pattern for creating resilient microservice applications. Circuit breaking allows Service Mesh networking, like in an electric circuit, to stop using one of the `v2` VMs if they start failing and hence limit the impact of failures and latency spikes to the end user. 
+In order to protect the end user from any failures to one of the *version=v2* VMs implement now with service mesh a https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[circuit breaker]. This is an important pattern used in environments with high traffic volumes and many destinations offering a loadbalance of the service (eg. Netflix) as it creates resilient microservice applications. Circuit breaking allows service mesh networking, like in an electric circuit, to monitor the healthiness of all destinations and stop using one of the *version=v2* VMs if it starts failing, hence limiting the impact of failures and latency spikes to the end user. 
 
-See the circuit breaker you will apply at https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/circuit-breaker.sh#L54-L66[circuit-breaker.sh]. In the case of a `5xx` error it will eject the VM that causes the issue for `3 minutes`. Execute the following to apply the circuit breaker.
+See the circuit breaker you will apply at https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-4/circuit-breaker.sh#L54-L66[circuit-breaker.sh]. In the case of a `5xx` error the mesh will eject the VM that causes the issue for `3 minutes`. Execute the following to apply the circuit breaker.
 
-[source,yaml,subs=attributes]
+[,sh,subs="attributes",role=execute]
 ----
 ./circuit-breaker.sh
 ----
 
-Next lets force an issue in `cars-vm-v2-b` VM by going in the OpenShift console to the `cars-vm-v2-b` (see below) access the console of the VM and execute the following to stop the car application running in the VM.
+Check that `Kiali` contains an updated version of the https://kiali-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/console/namespaces/travel-agency/istio/destinationrules/cars[*cars* `DestinationRule`] containing the circuit breaker. 
 
-[source,yaml,subs=attributes]
+Lets force an issue in `cars-vm-v2-b` VM by going in the OpenShift console to the `cars-vm-v2-b` (see below) access the console of the VM and execute the following to stop the car application running in the VM.
+
+[,sh,subs="attributes",role=execute]
 ----
 systemctl --user stop cars.service 
 ----
@@ -99,18 +157,25 @@ systemctl --user stop cars.service
 image::04-m4-t3-select-vm.png[]
 
 
-The result will be that one `v2` endpoint for the failing VM will be removed by the service mesh and no more requests will flow once it has detected the `5xx` failures. The exclusion lasts per configuration in the https://kiali-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/console/namespaces/travel-agency/istio/destinationrules/cars[`cars DestinationRule`] for `180s` upon which it will be retried and if failed it will again be excluded. If you renable the application with `systemctl --user start cars.service` in the VM traffic for `v2` will again start being loadbalanced between the 2 VMs. All of these scenarios are showcased in the animated image below, or alterniatvely you can try them monitor in the system and `Kiali` console.
+As a result the *version=v2* endpoint for the failing VM will be removed by the service mesh and no more requests will flow once it has detected the `5xx` failures. The exclusion lasts per configuration in the https://kiali-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/console/namespaces/travel-agency/istio/destinationrules/cars[`cars DestinationRule`] for `180s` upon which it will be retried and if failed it will again be excluded. If you renable the application by executing `systemctl --user start cars.service`, in the `cars-vm-v2-b` VM console, traffic for `v2` will again start being loadbalanced between the 2 VMs. All of these scenarios are showcased in the animated image below, or alterniatvely you can try them monitor in the system and `Kiali` console.
 
 image::05-m4-t3-circuit-breaker.gif[]
+
+*Contratulations* for helping _Travel Agency_ to make the solution as resillient as Netflix.
 
 
 ## Task 4: Apply business restrictions with service authorization policies
 
-The security team has been chasing you after a review of the setup which has revealed the services apply no rules on which service can access them, they have sent an urgent request to rectify this. Luckily OpenShift has equipped your services with a service user (`ServiceAccount`) when you deployed your VMs in the environment, you can apply within the Service Mesh authorization restrictions based on that principal included in the exchanged certificate.
+Although security features such as encryption are by default applied in the mesh other practices such as rules on what is a service's visibility and who can access them are not applied. This can have a two-fold effect. 
 
-a. First apply tue https://istio.io/latest/docs/ops/best-practices/security/#use-default-deny-patterns[best practice] `default deny all` policy. This will result in all services of the _Travel Agency_ to stop communicating with each other as they no longer have permission to do so (see `Kiali`). You can confirm the effect by accessing the http://istio-ingressgateway-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/[Travel Agency UI] which now returns `RBAC: access denied`.
-+
-[source,yaml,subs=attributes]
+* Services that are bad actors deployed by 3rd party in the cluster can gain access to a sensiteve service,
+* Configuration of all possible destinations in a very large cluster can make the `istio-proxy` sidecar very large causing evictions and possible cluster instability.
+
+In order to counter these possible issues you can apply within the service mesh authorization and visibility restrictions based on that principal included in the exchanged certificate.
+
+First apply the https://istio.io/latest/docs/ops/best-practices/security/#use-default-deny-patterns[best practice] `default deny all` policy. 
+
+[,sh,subs="attributes",role=execute]
 ----
 echo "apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
@@ -129,9 +194,15 @@ spec:
   {}" | oc apply -f -  
 ----
 
-b. Apply fine grained `AuthorizationPolicies` which will allow communications between `ingress-gateway` *->* `control-vm`, between services in the `travel-portal` *->* services in `travel-agency` and also all communications amongst the `travel-agency`.
+This will result in all services of the _Travel Agency_ to stop communicating with each other as they no longer have permission to do so (see `Kiali` Graph for the failures). You can confirm the effect by accessing the http://istio-ingressgateway-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/[Travel Agency Dashboard] which now returns `RBAC: access denied`.
+
+Then apply fine grained `AuthorizationPolicies` which will allow communications between: 
+
+* `istio-ingressgateway` *->* `control-vm`, 
+* from services in the `travel-portal` *->* to services in `travel-agency`, and 
+* all `travel-agency` services.
 +
-[source,yaml,subs=attributes]
+[,sh,subs="attributes",role=execute]
 ----
 echo "apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
@@ -172,7 +243,28 @@ spec:
            principals: [\"cluster.local/ns/travel-agency/sa/default\",\"cluster.local/ns/travel-portal/sa/default\"]" |oc apply -f -
 ----
 
-*Contratulations*, you have created a more secure and robust solution for _Travel Agency_ without modifying the original VM source code and acting upon your VMs equal to other Cloud Native components.
+In a little while you should once more gain access to the http://istio-ingressgateway-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/[Travel Agency Dashboard] and `Kiali` will show a restored network of communications between the solution. However, communication between `travel-control` and `travel-agency` services has been restricted as they are unnecessary.
+
+[,sh,subs="attributes",role=execute]
+----
+oc -n travel-control exec $(oc -n travel-control get po -l app=control-vm|awk '{print $1}'|tail -n 1) -- curl -o - -I  travels-vm.travel-agency.svc.cluster.local:8000/travels/London |jq
+----
+
+You should receive a a response that this operation is forbidden.
+
+[source,yaml,subs=attributes]
+----
+HTTP/1.1 403 Forbidden
+content-length: 19
+content-type: text/plain
+date: Mon, 24 Mar 2025 16:10:11 GMT
+server: envoy
+x-envoy-upstream-service-time: 1
+----
+
+## Congratulations
+
+You have come a long way to create a more secure and robust solution for _Travel Agency_ without modifying the original VM source code and acting upon your VMs equal to other Cloud Native components.
 
 
 
