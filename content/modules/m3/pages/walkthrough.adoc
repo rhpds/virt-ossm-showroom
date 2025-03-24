@@ -19,7 +19,7 @@ NOTE: The service mesh components have been installed by the platform team in th
 +
 image::02-jaeger-login.gif[]
 +
-* Open the link to the Jaeger URL (*Login with OpenShift* using the credentials (*username/password*). At  `Authorize Access` page select `Allow selected permissions`).
+* Open the link to the Jaeger URL (*Login with OpenShift* using the credentials (*${openshift_cluster_admin_username}/${openshift_cluster_admin_password}*). At  `Authorize Access` page select `Allow selected permissions`).
 * The `Jaeger` dashboard shows traces captured by the mesh of the traffic flowing between components that are part of the mesh. Whilst the `Service` drop down list offers to select the service that traffic is originating 
 * Currently, you should see there are no services listed. *Challenge: Can you figure out based on the information provided in Task 1 why that is?*
 +
@@ -27,7 +27,7 @@ image::03-t2-jaeger-empty.png[]
 * Leave the `Jaeger` dahsboard open in your browser as we will come back to it a little later and lets explore the next observability tool.
 
 . Lets now access the `Grafana` dashboard:
-* Follow the link to the `Grafana` URL login with *username/password*.
+* Follow the link to the `Grafana` URL login with *${openshift_cluster_admin_username}/${openshift_cluster_admin_password}*.
 * From the left menu follow *Dashboards → Browse → Istio → Istio Mesh Dashboard* to access the `Grafana`` dashboard that shows the services in the mesh, traffic volume towards them as well as HTTP codes of sucess failure of the requests.
 * You should see again there are no services listed or traffic flowing. *You must be suspecting something is not quite right by now. Can you point your finger where the problem is?*
 +
@@ -38,7 +38,7 @@ image::04-t2-grafana-empty.png[]
 
 
 . Login to `Kiali` to view a visualisation of the _Travel Agency_ solution in the mesh:
-* Follow the link to the `Kiali` URL, login with *username/password* and 
+* Follow the link to the `Kiali` URL, login with *${openshift_cluster_admin_username}/${openshift_cluster_admin_password}* and 
 * Fom the left hand side menu select _Graph_ and from the _Namespace_ drop-down menu (top) choose the `Select All` option.
 * Notice, again there is no Graph visualisation of any service _Travel Agency_ solution:
 +
