@@ -1,34 +1,54 @@
 # Module 1 - Explore OpenShift Virtualization and connect the virtual machines
 
-This set of labs is all about giving you the ability to go beyond understanding and using OpenShift as another platform of running Virtual Machines. We want you to actually make them first class citizens in a Cloud Native World. But, what is `Cloud Native` really and why should you care?
-In this set of lab scenarios we will explore how one can elevate the operation capabilities of a Virtual Machine based application once it is migrated in the OpenShift Containers Platform.
+As organizations shift towards cloud-native architectures, modernizing Virtual Machines (VMs) on OpenShift offers a strategic approach to improving efficiency, scalability, and automation. OpenShift Virtualization enables running VMs alongside containerized workloads, providing a unified platform for both traditional and cloud-native applications.
 
 ## Objectives
 
-* Understand the goals of modernizing VMs on OpenShift
-* Review the key OpenShift features to enhance VM capabilities
-* Understand Kubernetes services vor VMs
-* Use of Kubernetes network policies
-* Do a VM live migration
+This module covers key aspects of modernizing VMs on OpenShift, including:
 
-## Cloud Native is Patterns (CNCF)
+*Understanding the goals of VM modernization* - Learn why organizations are integrating VMs with OpenShift and how it enhances automation, security, and lifecycle management.
 
-* *Availability* -> Microservices & Netflix for everyone
-* *Automation* ->  Deployment & Management
-* *Acceleration* -> CI/CD & “the ABCDE” of automation
-* *Anywhere!* ->  Containers are portable
+*Key OpenShift features for VMs* - Explore built-in capabilities such as monitoring and security enhancements designed to optimize VM management.
 
-## Patterns need Tools 
+*Kubernetes services for VMs* - Understand how VMs can leverage Kubernetes-native features like service discovery and load balancing.
 
-Today you will experience these added capabilities through OpenShift tooling that will enable you to elevate the capabilities of your migrated Virtual Machines to be on par with containerised Cloud Native applications already.
+*Kubernetes network policies* - Learn how to apply Kubernetes network policies to secure and control VM network traffic.
 
-You will experience  how you can take advantage the tools that come with OpenShift such as:
+## About Cloud-native
 
-* Kubernetes - container orchestration
-* Prometheus - monitoring & analysis
-* OpenTracing - tracing interop
-* Service mesh - traffic management, security, observability and resillience
-* GitOps - declarative configuration, deployment automation and recovery
+Cloud-native is an approach to building and running applications that fully leverage cloud computing’s scalability, flexibility, and automation. It emphasizes microservices, containerization, declarative infrastructure, and continuous delivery to create resilient and efficient applications.
+
+Cloud-native applications are designed to be dynamic, scalable, and portable across cloud environments. They typically use Kubernetes for orchestration, DevOps practices for automation, and GitOps for version-controlled infrastructure management. This enables rapid development, deployment, and scaling while ensuring high availability and fault tolerance.
+
+By adopting cloud-native principles, organizations can improve agility, reduce operational overhead, and accelerate innovation in modern, distributed environments.
+
+## Cloud-native Patterns
+
+Cloud-native architectures follow key design patterns to ensure scalability, resilience, and automation. Some of the most common patterns include:  
+
+1. **Microservices** - Applications are broken into small, independent services that communicate via APIs, allowing flexibility, scalability, and independent deployments.  
+
+2. **Service Mesh** - A dedicated infrastructure layer (e.g., Istio) manages service-to-service communication, handling security, observability, and traffic control.  
+
+3. **Sidecar Pattern** - Additional functionality (such as logging, monitoring, or security) is offloaded to a separate container running alongside the main service, improving modularity.  
+
+4. **Strangler Pattern** - Legacy applications are gradually replaced by new cloud-native services, reducing migration risks while maintaining functionality.  
+
+5. **Event-Driven Architecture** - Services communicate asynchronously using events (e.g., Kafka, AMQ, JMS), improving responsiveness and scalability.  
+
+6. **Circuit Breaker** - Prevents cascading failures by detecting and stopping calls to failing services, enhancing system reliability.  
+
+7. **Autoscaling** - Applications automatically scale based on demand using Kubernetes Horizontal/Vertical Pod Autoscalers (HPA/VPA).  
+
+8. **Immutable Infrastructure** - Instead of updating running instances, new instances replace old ones, ensuring consistency and reducing configuration drift.  
+
+9. **GitOps** - Infrastructure and application configurations are managed declaratively in Git, enabling automated deployments and rollbacks.  
+
+10. **Serverless** - Code runs in ephemeral functions (e.g., AWS Lambda, Knative) without managing infrastructure, optimizing resource usage.  
+
+By adopting these cloud-native patterns, organizations can build highly scalable, resilient, and manageable applications suited for modern cloud environments.
+
+NOTE: Today you will experience some of these added capabilities through OpenShift tooling that will enable you to elevate the capabilities of your migrated Virtual Machines to be on par with containerised Cloud Native applications already.
 
 ## About OpenShift Virtualization
 
