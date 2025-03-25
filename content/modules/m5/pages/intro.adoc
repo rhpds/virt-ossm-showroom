@@ -23,6 +23,8 @@ OpenShift GitOps enables customers to build and integrate declarative git driven
 
 There’s no single tool that converts a development pipeline to "DevOps". By implementing a GitOps framework, updates and changes are pushed through declarative code, automating infrastructure and deployment requirements, and CI/CD.
 
+image::gitops-architecture.png[link="self",window=_blank]
+
 ## Benefits of OpenShift GitOps for Virtual Machines (VMs)
 
 While GitOps is typically associated with containerized applications, OpenShift GitOps also *supports managing Virtual Machines (VMs)* using OpenShift Virtualization. This provides several key advantages:
