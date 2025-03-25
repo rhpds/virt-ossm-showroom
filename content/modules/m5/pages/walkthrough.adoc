@@ -1,0 +1,7 @@
+# Declarative Management of VMs with OpenShift GitOps
+
+## Task 1: Explore the Argoc CD Dashboard and the existing applications
+
+## Task 2: Create an Argo application for travel-control
+
+## Task 3: Validate Argo CD Self-Healing (delete a VM)

@@ -1,0 +1,38 @@
+# Declarative Management of VMs with OpenShift GitOps
+
+## Objectives
+
+* Introduction of GitOps
+* Understanding OpenShift GitOps for Virtual Machines
+* Configure and manage VMs with GitOps
+
+## Brief Introduction to GitOps
+
+GitOps is a modern approach to infrastructure and application management that leverages Git as the single source of truth for declarative system configurations. 
+
+By using Git repositories to define and manage infrastructure, GitOps enables automated deployment, version control, and continuous delivery. Changes are made through pull requests, ensuring consistency, auditability, and rollback capabilities. This approach improves collaboration among teams while reducing human errors.
+
+
+## About OpenShift GitOps
+
+OpenShift GitOps, based on *Argo CD*, extends GitOps principles to Red Hat OpenShift environments, offering a robust solution for managing Kubernetes-native applications and virtualized workloads.
+
+Red Hat OpenShift GitOps is an operator that provides a workflow that integrates git repositories, continuous integration/continuous delivery (CI/CD) tools, and Kubernetes to realize faster, more secure, scalable software development, without compromising quality.
+
+OpenShift GitOps enables customers to build and integrate declarative git driven CD workflows directly into their application development platform.
+
+There’s no single tool that converts a development pipeline to "DevOps". By implementing a GitOps framework, updates and changes are pushed through declarative code, automating infrastructure and deployment requirements, and CI/CD.
+
+## Benefits of OpenShift GitOps for Virtual Machines (VMs)
+
+While GitOps is typically associated with containerized applications, OpenShift GitOps also *supports managing Virtual Machines (VMs)* using OpenShift Virtualization. This provides several key advantages:
+
+* *Consistent Infrastructure as Code (IaC)*: By managing VM configurations and lifecycle in Git, teams can apply the same declarative workflows used for Kubernetes applications, ensuring consistency and repeatability.
+
+* *Automated Deployments and Rollbacks*: OpenShift GitOps continuously monitors the desired state in Git and automatically reconciles deviations. This ensures VMs are always deployed correctly and allows quick rollbacks if needed.
+
+* *Improved Security and Compliance*: Git-based workflows enable auditable change management, allowing teams to track and review all modifications to VM configurations while enforcing policies and compliance standards.
+
+* *Scalability and Hybrid Cloud Support*: OpenShift GitOps facilitates deploying and managing VMs across on-premises and cloud environments, providing a unified approach to infrastructure automation.
+
+By integrating GitOps principles with OpenShift Virtualization, organizations can streamline VM management, enhance security, and improve operational efficiency in hybrid cloud environments.

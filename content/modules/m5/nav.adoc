@@ -1,4 +1,4 @@
-.Module 5 - 
+.Module 5 - Declarative Management of VMs with OpenShift GitOps
 * xref:intro.adoc[Introduction]
 * xref:walkthrough.adoc[Walkthrough]
 * xref:finish.adoc[Finish]

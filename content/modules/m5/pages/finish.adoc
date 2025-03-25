@@ -1,0 +1,5 @@
+# Declarative Management of VMs with OpenShift GitOps
+
+## Congratulations on completing this module!
+
+Continue now to _Module 6 - Self-service provisioning VMs with Red Hat Developer Hub_ 
