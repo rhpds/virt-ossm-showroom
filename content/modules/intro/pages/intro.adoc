@@ -2,7 +2,12 @@
 
 Welcome to the lab *{lab_name}.*
 
-In this lab you are working as *{openshift_cluster_admin_username}*.
+In this lab you will be using OpenShift as a cluster admin.
+Use the following details to log in.
+
+* **Console:** link:{openshift_cluster_console_url}[window=_blank]
+* **Username:** {openshift_cluster_admin_username}
+* **Password:** {openshift_cluster_admin_password}
 
 ## Objectives
 
@@ -15,11 +20,20 @@ In this lab you are working as *{openshift_cluster_admin_username}*.
 
 // Open a terminal (*`Terminal`* -> *`New Terminal`* from the menu) in the _code-server_ so that you can execute the commands during the labs.
 
-You have a terminal on your right hand side with all the lab assets cloned form the Git repo: link:https://github.com/rhpds/virt-ossm-workspace[virt-ossm-workspace,window=_blank]. List your current directory and see if all the assets are available:
+You have a terminal on your right hand side and we have provided you with a repo assets (scripts) to be used throughout the lab.
+
+Please clone the repository as shown below:
 
 [source,shell,subs=attributes,role=execute]
 ----
-ls -la
+git clone {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}
+----
+
+List your cloned directory and see if all the assets are available:
+
+[source,shell,subs=attributes,role=execute]
+----
+ls -la {virt_ossm_workspace_project}
 ----
 
 You can go and inspect these resources in this repository at a later stage.

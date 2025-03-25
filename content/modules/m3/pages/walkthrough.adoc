@@ -59,7 +59,7 @@ image::06-t2-ossm-travel-agency-1-container.png[]
 image::06-t2-ossm-travel-control-1-container.png[]
 
 
-Lets add the _Travel Agency_ solution to the service mesh. First create a `ServiceMeshMember` resource (see the resources at https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-3/servicemeshmember.yaml[servicemeshmember.yaml]) for each of the 3 namespaces of _Travel Agency_ which will include them to the mesh.
+Lets add the _Travel Agency_ solution to the service mesh. First create a `ServiceMeshMember` resource (see the resources at {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-3/servicemeshmember.yaml[servicemeshmember.yaml]) for each of the 3 namespaces of _Travel Agency_ which will include them to the mesh.
 
 [,sh,subs="attributes",role=execute]
 ----
@@ -68,7 +68,7 @@ oc apply -f servicemeshmember.yaml
 
 Following that, add an `envoy` (namely the `istio-proxy` container) to each `POD` of the _Travel Agency_.
 
-* The following actions insert the annotation `sidecar.istio.io/inject` in each `POD` and restarts them so that service mesh injects the `istio-proxy` container and starts applying the policies. For details of each action see the scripts at https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-3/add-envoy-to-travel-agency-services-domain.sh[add-envoy-to-travel-agency-services-domain.sh], https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-3/add-envoy-to-travel-portal-domain.sh[add-envoy-to-travel-portal-domain.sh], https://github.com/rhpds/virt-ossm-workspace/blob/main/lab-3/add-envoy-to-travel-control.sh[add-envoy-to-travel-control.sh]
+* The following actions insert the annotation `sidecar.istio.io/inject` in each `POD` and restarts them so that service mesh injects the `istio-proxy` container and starts applying the policies. For details of each action see the scripts at {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-3/add-envoy-to-travel-agency-services-domain.sh[add-envoy-to-travel-agency-services-domain.sh], {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-3/add-envoy-to-travel-portal-domain.sh[add-envoy-to-travel-portal-domain.sh], {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-3/add-envoy-to-travel-control.sh[add-envoy-to-travel-control.sh]
 
 [,sh,subs="attributes",role=execute]
 ----
