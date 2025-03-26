@@ -26,8 +26,8 @@ Currently, you should see there are no services listed.
 
 ++++
 <details>
-  <summary style="color:red;"><b>Challenge Yourself with this Question<b></summary>
-  <p style="color:red;"><b>Can you figure out based on the information provided in the introduction section why that is?<b></p>
+  <summary style="color:red;"><b>Challenge Yourself with this Question</b></summary>
+  <p style="color:red;"><strong>Can you figure out based on the information provided in the introduction section why that is?</strong></p>
 </details>
 ++++
 

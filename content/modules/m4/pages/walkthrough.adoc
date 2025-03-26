@@ -18,7 +18,7 @@ Open the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-syste
 Execute script {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/expose-control-vm.sh[expose-control-vm.sh] to deploy these configurations:
 [source,yaml,subs=attributes]
 ----
-./expose-control-vm.sh apps.cluster-brdbs.dynamic.redhatworkshops.io
+./expose-control-vm.sh {openshift_api_url}
 ----
 
 Refresh the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.cluster-brdbs.dynamic.redhatworkshops.io and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
