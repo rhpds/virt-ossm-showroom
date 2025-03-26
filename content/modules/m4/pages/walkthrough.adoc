@@ -5,7 +5,7 @@
 
 In the previous module you deployed and secured the _Travel Agency_ solution but there is no access to it. In a traditional environment in order to enable access to a VM from the public internet you would need to open tickets for firewall rules, loadbalancers, external DNS etc. however in the current environment networking can be defined between OpenShift and service mesh.
 
-Openning the URL to the _Ingress Gateway_ (the mesh component used to control incoming traffic) at http://istio-ingressgateway-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/[window=_blank] does not return the _Travel Agency_ dashboard page. This is expected as we have not yet exposed any services from the mesh. 
+Openning the URL to the _Ingress Gateway_ (the mesh component used to control incoming traffic) at http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[window=_blank] does not return the _Travel Agency_ dashboard page. This is expected as we have not yet exposed any services from the mesh. 
 
 Exposing the _Travel Agency_ dashboard to the outside world via the mesh _Ingress Gateway_ (find more extensive information in the documentation https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/service_mesh/index#ossm-routing-traffic[Managing traffic in your service mesh, window=_blank] ) requires the addition of the following Custom Resources (CRs) to configure the traffic flow:
 
@@ -27,7 +27,7 @@ cd $HOME/virt-ossm-workspace/lab-4
 ./expose-control-vm.sh {openshift_cluster_ingress_domain}
 ----
 
-Refresh the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.cluster-brdbs.dynamic.redhatworkshops.io[window=_blank] and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
+Refresh the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}[window=_blank] and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
 
 After a brief time the `Kiali` also shows the traffic flowing via the `istio-ingressgateway` towards the `control-vm`.
 
@@ -114,7 +114,7 @@ After you have verified the new version is stable go ahead and increase traffic 
 ./multipleversions-for-car-vm-in-the-mesh.sh 20 80
 ----
 
-The config in `Kiali` has been updated (see https://kiali-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/console/namespaces/travel-agency/istio/virtualservices/cars[cars `VirtualService`, window=_blank]) and soon the graph should show `80%` traffic flowing to `v2`. 
+The config in `Kiali` has been updated (see https://kiali-istio-system.{openshift_cluster_ingress_domain}/console/namespaces/travel-agency/istio/virtualservices/cars[cars `VirtualService`, window=_blank]) and soon the graph should show `80%` traffic flowing to `v2`. 
 
 ## Task 3: Circuit Breakers
 
@@ -151,7 +151,7 @@ See the circuit breaker you will apply at {virt_ossm_workspace_repo}/{virt_ossm_
 ./circuit-breaker.sh
 ----
 
-Check that `Kiali` contains an updated version of the https://kiali-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/console/namespaces/travel-agency/istio/destinationrules/cars[*cars* `DestinationRule`, window=_blank] containing the circuit breaker. 
+Check that `Kiali` contains an updated version of the https://kiali-istio-system.{openshift_cluster_ingress_domain}/console/namespaces/travel-agency/istio/destinationrules/cars[*cars* `DestinationRule`, window=_blank] containing the circuit breaker. 
 
 Lets force an issue in `cars-vm-v2-b` VM by going in the OpenShift console to the `cars-vm-v2-b` (see below) access the console of the VM and execute the following to stop the car application running in the VM.
 
@@ -163,7 +163,7 @@ systemctl --user stop cars.service
 image::04-m4-t3-select-vm.png[link=self, window=blank]
 
 
-As a result the *version=v2* endpoint for the failing VM will be removed by the service mesh and no more requests will flow once it has detected the `5xx` failures. The exclusion lasts per configuration in the https://kiali-istio-system.apps.cluster-szndb.dynamic.redhatworkshops.io/console/namespaces/travel-agency/istio/destinationrules/cars[`cars DestinationRule`, window=_blank] for `180s` upon which it will be retried and if failed it will again be excluded. If you renable the application by executing `systemctl --user start cars.service`, in the `cars-vm-v2-b` VM console, traffic for `v2` will again start being loadbalanced between the 2 VMs. All of these scenarios are showcased in the animated image below, or alterniatvely you can try them monitor in the system and `Kiali` console.
+As a result the *version=v2* endpoint for the failing VM will be removed by the service mesh and no more requests will flow once it has detected the `5xx` failures. The exclusion lasts per configuration in the https://kiali-istio-system.{openshift_cluster_ingress_domain}/console/namespaces/travel-agency/istio/destinationrules/cars[`cars DestinationRule`, window=_blank] for `180s` upon which it will be retried and if failed it will again be excluded. If you renable the application by executing `systemctl --user start cars.service`, in the `cars-vm-v2-b` VM console, traffic for `v2` will again start being loadbalanced between the 2 VMs. All of these scenarios are showcased in the animated image below, or alterniatvely you can try them monitor in the system and `Kiali` console.
 
 image::05-m4-t3-circuit-breaker.gif[link=self, window=blank]
 
@@ -200,7 +200,7 @@ spec:
   {}" | oc apply -f -  
 ----
 
-This will result in all services of the _Travel Agency_ to stop communicating with each other as they no longer have permission to do so (see `Kiali` Graph for the failures). You can confirm the effect by accessing the http://istio-ingressgateway-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/[Travel Agency Dashboard, window=_blank] which now returns `RBAC: access denied`.
+This will result in all services of the _Travel Agency_ to stop communicating with each other as they no longer have permission to do so (see `Kiali` Graph for the failures). You can confirm the effect by accessing the http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[Travel Agency Dashboard, window=_blank] which now returns `RBAC: access denied`.
 
 Then apply fine grained `AuthorizationPolicies` which will allow communications between: 
 
@@ -249,7 +249,7 @@ spec:
            principals: [\"cluster.local/ns/travel-agency/sa/default\",\"cluster.local/ns/travel-portal/sa/default\"]" |oc apply -f -
 ----
 
-In a little while you should once more gain access to the http://istio-ingressgateway-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/[Travel Agency Dashboard, window=_blank] and `Kiali` will show a restored network of communications between the solution. However, communication between `travel-control` and `travel-agency` services has been restricted as they are unnecessary.
+In a little while you should once more gain access to the http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[Travel Agency Dashboard, window=_blank] and `Kiali` will show a restored network of communications between the solution. However, communication between `travel-control` and `travel-agency` services has been restricted as they are unnecessary.
 
 [,sh,subs="attributes",role=execute]
 ----
