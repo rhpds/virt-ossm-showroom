@@ -16,9 +16,11 @@ Open the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-syste
 * https://istio.io/latest/docs/reference/config/networking/destination-rule/[`DestinationRule`]: Defines policies (loadbalancing, retries, failover, security) that apply to traffic intended for a service after routing has occurred.
 
 Execute script {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/expose-control-vm.sh[expose-control-vm.sh] to deploy these configurations:
-[source,yaml,subs=attributes]
+
+[,sh,subs="attributes",role=execute]
 ----
-./expose-control-vm.sh apps.cluster-brdbs.dynamic.redhatworkshops.io
+cd lab-5
+./expose-control-vm.sh {openshift_api_url}
 ----
 
 Refresh the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.cluster-brdbs.dynamic.redhatworkshops.io and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
