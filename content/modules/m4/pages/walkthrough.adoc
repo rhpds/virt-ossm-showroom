@@ -7,7 +7,7 @@ In the previous module you deployed and secured the _Travel Agency_ solution but
 
 Openning the URL to the _Ingress Gateway_ (the mesh component used to control incoming traffic) at http://istio-ingressgateway-istio-system.apps.cluster-brdbs.dynamic.redhatworkshops.io/[window=_blank] does not return the _Travel Agency_ dashboard page. This is expected as we have not yet exposed any services from the mesh. 
 
-Exposing the _Travel Agency_ dashboard to the outside world via the mesh _Ingress Gateway_ (more extensive information in the documentation https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/service_mesh/index#ossm-routing-traffic[Managing traffic in your service mesh, window=_blank] ) requires the addition of the following Custom Resources (CRs) to configure the traffic flow:
+Exposing the _Travel Agency_ dashboard to the outside world via the mesh _Ingress Gateway_ (find more extensive information in the documentation https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/service_mesh/index#ossm-routing-traffic[Managing traffic in your service mesh, window=_blank] ) requires the addition of the following Custom Resources (CRs) to configure the traffic flow:
 
 * https://istio.io/latest/docs/reference/config/networking/gateway/[`Gateway`, window=_blank]: A load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections.
 
@@ -15,11 +15,11 @@ Exposing the _Travel Agency_ dashboard to the outside world via the mesh _Ingres
 
 * https://istio.io/latest/docs/reference/config/networking/destination-rule/[`DestinationRule`, window=_blank]: Defines policies (loadbalancing, retries, failover, security) that apply to traffic intended for a service after routing has occurred.
 
-Execute script {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/expose-control-vm.sh[expose-control-vm.sh, window=_blank] to deploy these configurations:
+Execute script {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/expose-control-vm.sh[expose-control-vm.sh, window=_blank] in the *Terminal*  to deploy these configurations:
 
 [,sh,subs="attributes",role=execute]
 ----
-cd $HOME/virt-ossm-showroom/lab-4
+cd $HOME/virt-ossm-workspace/lab-4
 ----
 
 [,sh,subs="attributes",role=execute]
@@ -35,11 +35,11 @@ image::01-m4-t1-ingress-control.gif[link=self, window=blank]
 
 ## Task 2: Perform a Canary Release of a new versions of a _Virtual Machine_ application
 
-Often you will be required to deploy and maintain multiple versions of an application to provide new features to a subset of customers. In this occasion you awill be releasing *v2* of the *cars-vm* allowing *10%* of new customer requests to access the new service whilst the remainder will continue to go to *v1*. If all goes well you will increase the traffic to *v2* to *80%*.
+Often you will be required to deploy and maintain multiple versions of an application to provide new features to a subset of customers. In this occasion you will be releasing *v2* of the *cars-vm* allowing *10%* of new customer requests to access the new service whilst the remainder will continue to go to *v1*. If all goes well you will increase the traffic to *v2* to *80%*.
 
-In order to achieve this you are going to first deploy a new Virtual Machine `cars-vm-v2-a` with `version=v2` (see {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-a.yaml[cars-vm-v2-a.yaml,window=_blank]).
+In order to achieve this you are going to first deploy a new Virtual Machine `cars-vm-v2-a` with `version=v2` (see {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-a.yaml[cars-vm-v2-a.yaml#L38,window=_blank]).
 
-Then you need to configure the mesh traffic as through a `DestinationRule` which will direct traffic destined for the `cars-vm` service to both `v1` and `v2` VMs based on their `version=v??` label (see {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/multipleversions-for-car-vm-in-the-mesh.sh#L30-L36[multipleversions-for-car-vm-in-the-mesh.sh,window=_blank]).
+Then you need to configure the mesh traffic with a `DestinationRule` which will direct traffic destined for the `cars-vm` service to both `v1` and `v2` VMs based on their `version=v??` label (see {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/multipleversions-for-car-vm-in-the-mesh.sh#L30-L36[multipleversions-for-car-vm-in-the-mesh.sh,window=_blank]).
 
 [source,yaml,subs=attributes]
 ----
@@ -61,7 +61,7 @@ spec:
       name: v2
 ----
 
-Finally define a `VirtualService` which allows `90%` of the traffic to reach `v1` and `10%` to the new `cars-vm-v2-a`.
+Finally define a `VirtualService` which splits the traffic so that `90%` of the traffic reaches `v1` and `10%` to the new `cars-vm-v2-a` (which is `v2`).
 
 [source,yaml,subs=attributes]
 ----
@@ -89,9 +89,9 @@ spec:
           weight: 10
 ----
 
-NOTE: We deliver the above via the attached terminal but you could as easily have used the `Kiali` consile to configure them
+NOTE: We will deliver the above via the attached terminal but you could as easily have used `Kiali` to define the configurations.
 
-Execute the script which performs the above actions utilising Service Mesh *cars* `VirtualService` to apply a `weight` of *90* in order to route`90%` of the traffic to `v1`.
+Execute the script below in the *Terminal* which delivers the above configurations:
 
 [,sh,subs="attributes",role=execute]
 ----
