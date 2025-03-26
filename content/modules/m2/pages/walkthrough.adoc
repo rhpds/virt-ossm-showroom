@@ -378,6 +378,34 @@ Open the _business dashboard_ and validate that it is still working.
 
 You will also recognize that the control-vm is *automatically recreated*.
 
+NOTE: It is also possible to autoscale Virtual Machines by using a HorizontalPodAutoscaler (HPA) with a VirtualMachinePool.
+
+Simply reference it in the spec of the autoscaler:
+
+[yaml,subs="attributes",]
+----
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: vm-pool-hpa
+  namespace: travel-control
+spec:
+  maxReplicas: 10
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: pool.kubevirt.io/v1alpha1
+    kind: VirtualMachinePool
+    name: travel-control-vm-pool
+  targetCPUUtilizationPercentage: 50
+----
+
+[,sh,subs="attributes",role=execute]
+----
+oc apply -f ./vm-pool-hpa.yaml
+----
+
+Now the `HorizontalPodAutoscaler` will scale up instances if the CPU utilization exceeds 50%.
+
 ## Congratulations
 
 In this module you have deployed the business dashboard (aka `control-vm`), exposed it to the cluster outside and explored some of the scaling capabilities with OpenShift Virtualization.
