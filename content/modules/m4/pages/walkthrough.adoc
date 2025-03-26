@@ -248,11 +248,11 @@ spec:
            principals: [\"cluster.local/ns/travel-agency/sa/default\",\"cluster.local/ns/travel-portal/sa/default\"]" |oc apply -f -
 ----
 
-In a little while you should once more gain access to the http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[Travel Agency Dashboard, window=_blank] and `Kiali` will show a restored network of communications between the solution. However, communication between `travel-control` and `travel-agency` services has been restricted as they are unnecessary.
+In a little while you should once more gain access to the http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[Travel Agency Dashboard, window=_blank] and `Kiali` will show a restored network of communications between the solution. However, communication between `travel-control` and `travel-agency` services has been restricted as they are unnecessary and the applied `AuthorizationPolicy` rule do not permit it.
 
 [,sh,subs="attributes",role=execute]
 ----
-oc -n travel-control exec $(oc -n travel-control get po -l app=control-vm|awk '{print $1}'|tail -n 1) -- curl -o - -I  travels-vm.travel-agency.svc.cluster.local:8000/travels/London |jq
+oc -n travel-control exec $(oc -n travel-control get po -l app=control-vm|awk '{print $1}'|tail -n 1) -- curl -o - -I  travels-vm.travel-agency.svc.cluster.local:8000/travels/London
 ----
 
 You should receive a a response that this operation is forbidden.
