@@ -37,7 +37,7 @@ image::01-m4-t1-ingress-control.gif[link=self, window=blank]
 
 Often you will be required to deploy and maintain multiple versions of an application to provide new features to a subset of customers. In this occasion you will be releasing *v2* of the *cars-vm* allowing *10%* of new customer requests to access the new service whilst the remainder will continue to go to *v1*. If all goes well you will increase the traffic to *v2* to *80%*.
 
-In order to achieve this you are going to first deploy a new Virtual Machine `cars-vm-v2-a` with `version=v2` (see {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-a.yaml[cars-vm-v2-a.yaml#L38,window=_blank]).
+In order to achieve this you are going to first deploy a new Virtual Machine `cars-vm-v2-a` with `version=v2` (see {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-a.yaml#L38[cars-vm-v2-a.yaml,window=_blank]).
 
 Then you need to configure the mesh traffic with a `DestinationRule` which will direct traffic destined for the `cars-vm` service to both `v1` and `v2` VMs based on their `version=v??` label (see {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/multipleversions-for-car-vm-in-the-mesh.sh#L30-L36[multipleversions-for-car-vm-in-the-mesh.sh,window=_blank]).
 
@@ -124,13 +124,13 @@ The new metrics visualisation can enable business teams to understand the level 
 * guarantee high availability of requests to the `cars-vm` service, and
 * ensure any failures do not impact end-user requests.
 
-Service mesh as we have already seen provides the capability for traffic management in order additionally offer resillience you are going to also take advantage of the https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[_circuit breaker_, window=_blank] feature of the mesh.
+Service mesh in order to provide resillience to the included services implements Netflix like features. You can take advantage of the https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[_circuit breaker_, window=_blank] feature of the mesh to achieve the required resillience in the network of VMs/containers making up the Travel Agency solution.
 
-First deploy an additional _Virtual Machine_ {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`] that will also be exposed as part of `cars-vm` service (together with `cars-vm` and `cars-vm-v2-a`). You will also label with version *v2* hence making requestes towards *v2* hightly available between the `cars-vm-v2-a` and `cars-vm-v2-b` _Virtual Machines_.
+First, deploy an additional VM {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`] that will also be exposed as part of `cars-vm` service (together with `cars-vm` and `cars-vm-v2-a`). It will also be labelled with version *v2* hence making requests towards *v2* hightly available between the `cars-vm-v2-a` and `cars-vm-v2-b` VMs.
 
-Once the VM is up and running configure a https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[_circuit breaker_, window=_blank] in the mesh so that if there is a problem on either of the 2 *version=v2* _Virtual Machines_ the service mesh will stop directing traffic to it until it has recovered.
+Once the VM is up and running configure the https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[_circuit breaker_, window=_blank] in the mesh so that if there is a problem on either of the 2 *version=v2* VMs the mesh will stop directing traffic to it until it has recovered.
 
-Execute the following to deploy the new _Virtual Machine_  {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`,window=_blank].
+Execute the following to deploy the new VM {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`,window=_blank].
 
 [,sh,subs="attributes",role=execute]
 ----
