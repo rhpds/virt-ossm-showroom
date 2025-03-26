@@ -1,1 +1,5 @@
 # Module 2 - Scaling Virtual Machines on OpenShift
+
+## Congratulations on completing this module!
+
+Continue now to Module 3 - _Enhancing Networking & Observability with OpenShift Service Mesh (OSSM)_ 

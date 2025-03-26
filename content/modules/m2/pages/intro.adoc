@@ -1,13 +1,14 @@
 ## Module 2 - Scaling Virtual Machines on OpenShift
 
 In this module we are going to finish setting up the Travel Application demo.
-And we are exploring the scaling options for Virtual Machines in OpenShift.
+And we are exploring the scaling options for Virtual Machines in OpenShift. 
+This hands-on experience will demonstrate how OpenShift Virtualization enables efficient scaling and workload management.
 
 ## Objectives
 
-* Complete the Travel Application Demo
-* Scaling up Virtual Machines
-* Scaling out Virtual Machines
+* *Complete the Travel Application Demo* - Deploy a VM and connect it with the existing application components
+* *Scaling up Virtual Machines* -  Increase the resources (CPU, memory) allocated to a VM to handle higher workloads efficiently.
+* *Scaling out Virtual Machines* - Deploy multiple VM instances to distribute workloads and enhance availability and performance.
 
 ## About Scaling of Virtual Machines
 
