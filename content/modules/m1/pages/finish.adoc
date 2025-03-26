@@ -2,4 +2,4 @@
 
 ## Congratulations on completing this module!
 
-Continue now to _Scaling Virtual Machines on OpenShift_ 
+Continue now to Module 2 - _Scaling Virtual Machines on OpenShift_ 
