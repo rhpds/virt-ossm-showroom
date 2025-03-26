@@ -146,9 +146,9 @@ Once the VM is up and running configure the https://istio.io/latest/docs/tasks/t
 ./circuit-breaker.sh
 ----
 
-See the circuit breaker you will apply at {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/circuit-breaker.sh#L54-L66[circuit-breaker.sh]. In the case of a `5xx` error the mesh will eject the VM that causes the issue for `3 minutes`. Execute the following to apply the circuit breaker.
+See the circuit breaker applied at {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/circuit-breaker.sh#L54-L66[circuit-breaker.sh, window=_blank], you will notice that in the case of a `5xx` error the mesh will eject the VM that causes the issue for `3 minutes`. 
 
-In order to protect the end user from any failures to one of the *version=v2* VMs implement now with service mesh a https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[circuit breaker, window=_blank]. This is an important pattern used in environments with high traffic volumes and many destinations offering a loadbalance of the service (eg. Netflix) as it creates resilient microservice applications. Circuit breaking allows service mesh networking, like in an electric circuit, to monitor the healthiness of all destinations and stop using one of the *version=v2* VMs if it starts failing, hence limiting the impact of failures and latency spikes to the end user. 
+The https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[circuit breaker, window=_blank] is an important pattern, used in environments with high traffic volumes and many destinations which offer the ability to loadbalance requests to multiple services, as it creates resilient microservice applications. Circuit breaking allows service mesh networking, like in an electric circuit, to monitor the healthiness of all destinations and stop using one of the *version=v2* VMs if it starts failing, hence limiting the impact of failures and latency spikes to the end user. 
 
 Check that `Kiali` contains an updated version of the https://kiali-istio-system.{openshift_cluster_ingress_domain}/console/namespaces/travel-agency/istio/destinationrules/cars[*cars* `DestinationRule`, window=_blank] containing the circuit breaker. 
 
