@@ -413,7 +413,12 @@ oc apply -f ./vm-pool-hpa.yaml
 
 Now the `HorizontalPodAutoscaler` will scale up instances if the CPU utilization exceeds 50%.
 
-You should see 8 additional VMs spinning up...
+Go to *Workloads -> HorizontalPodAutoscalers* and select `vm-pool-hpa`.
+
+image::vm-hpa-overview.png[link="self",window=_blank]
+
+In the Metrics section you'll see the Current and Target Values. If the Target Value is getting exceeded additional VMs will spin up.
+It might look like in the next image...
 
 image::vms-hpa.png[link="self",window=_blank]
 
