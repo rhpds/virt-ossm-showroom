@@ -1,5 +1,14 @@
 # Module 1 - Explore OpenShift Virtualization and connect the virtual machines
 
+
+IMPORTANT: Please login as `cluster-admin` in order to have all necessary permissions for this lab.
+
+[,sh,subs="attributes",role=execute]
+----
+oc login --username=admin --server={openshift_api_url} --password={openshift_cluster_admin_password}
+----
+
+
 NOTE: All assets for this module are in the folder `lab-1`. Please change the directory into this folder.
 
 [,sh,subs="attributes",role=execute]
@@ -180,7 +189,7 @@ If you'd like, update the Route to disable cookies and sticky sessions.
 
 [,sh,role=execute]
 ----
-oc annotate route travels-vm haproxy.router.openshift.io/disable_cookies='true'
+oc annotate route travels-vm haproxy.router.openshift.io/disable_cookies='true' -n travel-agency
 ----
 
 ## Task 5: Create a network policy to block egress (like firewall rules)
@@ -198,7 +207,7 @@ In this step, you will test blocking egress access from the `cars-vm` virtual ma
 
 . On the left side, click *Networking -> NetworkPolicies -> Create NetworkPolicy*.
 
-. Select the YAML View radio button.
+. Select the *YAML* View radio button.
 
 . Replace the sample YAML with the following NetworkPolicy.
 
@@ -242,6 +251,13 @@ curl http://www.google.com
 ----
 
 image::vm-curl-response-working.png[link="self",window=_blank]
+
+Now clean up by deleting the `NetworkPolicy`:
+
+[,sh,role=execute]
+----
+oc delete networkpolicy noegress -n travel-agency
+----
 
 ## Congratulations
 
