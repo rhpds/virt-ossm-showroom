@@ -19,8 +19,12 @@ Execute script {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/mai
 
 [,sh,subs="attributes",role=execute]
 ----
-cd lab-5
-./expose-control-vm.sh {openshift_api_url}
+cd $HOME/virt-ossm-showroom/lab-4
+----
+
+[,sh,subs="attributes",role=execute]
+----
+./expose-control-vm.sh {openshift_cluster_ingress_domain}
 ----
 
 Refresh the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.cluster-brdbs.dynamic.redhatworkshops.io[window=_blank] and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
