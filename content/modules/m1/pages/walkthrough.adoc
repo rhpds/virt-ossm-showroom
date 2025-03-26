@@ -1,37 +1,43 @@
 # Module 1 - Explore OpenShift Virtualization and connect the virtual machines
 
+NOTE: All assets for this module are in the folder `lab-1`. Please change the directory into this folder.
+
+[,sh,subs="attributes",role=execute]
+----
+cd lab-1
+----
+
 ## Task 1: Explore the deployed Virtual Machines
 
-View the overall health of your OpenShift Virtualization environment in the web console by navigating to the *Home 
-Overview* page in the OpenShift Container Platform web console. 
+View the overall health of your OpenShift Virtualization environment in the web console by navigating to the *Home -> Overview* page in the OpenShift Container Platform web console. 
 The Status card displays the overall health of OpenShift Virtualization based on the alerts and conditions.
 
-image::vm-health-overview.png[]
+image::vm-health-overview.png[link="self",window=_blank]
 
-Now navigate to *Virtualization - VirtualMachines*.
+Now navigate to *Virtualization -> VirtualMachines*.
 You will see the list of running VMs in the travel-agency namespace:
 
-image::vms-overview.png[]
+image::vms-overview.png[link="self",window=_blank]
 
-Click on the `cars-vm`, this gets you to the details of this VM.
-You can explore the configuration (storage, networking, hardware devices, users etc.) of this VM and also use the *Console* tab to login to the VM.
+Click on the `cars-vm`, this directs you to the details of this VM.
+You can explore the configuration (storage, networking, hardware devices, users etc.) of this VM and also use the `Console` tab to login to the VM.
 
-image::vm-detail.png[]
+image::vm-detail.png[link="self",window=_blank]
 
-Click on the Metrics tab. 
+Click on the `Metrics` tab. 
 This gives you an overview of the VM metrics, like memory and cpu consumption, storage and networking data.
 
-image::vm-metrics.png[]
+image::vm-metrics.png[link="self",window=_blank]
 
-Now click on `Virtualization dashboard` on the top right of the page.
+Now click on the link `Virtualization dashboard` on the top right of the page and explore the Prometheus dashboard.
 
-image::vm-metrics-dashboard.png[]
+image::vm-metrics-dashboard.png[link="self",window=_blank]
 
 So far we have explored the Virtualization Dashboard in the OpenShift console and some of the out of the box available observability features in OpenShift for VMs.
 
-But the workloads running inside the VMs are currently not accessable from other pods or VMs. This is what we want to achieve in the next step.
+NOTE: But the workloads running inside the VMs are currently not accessable from other pods or VMs. This is what we want to achieve in the next step.
 
-## Loadbalancing Virtual Machines
+## About Loadbalancing Virtual Machines
 
 In most systems, load balancing virtual machiness typically requires multiple different tools and configurations to work properly.
 For example, to load balance two virtual machines internally and externally you might have to:
@@ -45,20 +51,19 @@ For example, to load balance two virtual machines internally and externally you 
 * [ ] Configure health check endpoints and tests
 * [ ] Configure health check timeouts and intervals
 
-OpenShift trivializes networking and load balancing.
-In this step, you'll accomplish all of this, without leaving OpenShift.
+NOTE: OpenShift trivializes networking and load balancing. In this step, you'll accomplish all of this, without leaving OpenShift.
 
 ## Internal Loadbalancing with Kubernetes Services
 
-Services are internal load balancers in OpenShift.
-Services route traffic to resources by identifing them with a label selector.
-Labels can be applied to any OpenShift resources, including virtual machines,to identify and group them.
-You will create a service and identify the virtual machines it services as a load balancer by means of labels on the virtual machines.
+*Kubernetes Services* are internal load balancers in OpenShift.
+These Services route traffic to resources by identifing them with a label selector.
+Labels can be applied to any OpenShift resources, including virtual machines, to identify and group them.
+You will create a service and identify the virtual machines it services as a load balancer by the means of labels on the virtual machines.
 
-## Task 2: Create a service for the cars-vm
+## Task 2: Create a service for the cars-vm Virtual Machine
 
 The actual workload running in this virtual machine is an http based API service running on port 8000.
-So let us create a service in the `travel-agency` namespace that exposes port 8000 and sends traffic to all VMs labeled as `kubevirt.io/domain: cars-vm`
+Let us create a service in the `travel-agency` namespace that exposes port 8000 and sends traffic to all VMs labeled as `kubevirt.io/domain: cars-vm`
 
 [,yaml,subs="attributes"]
 ----
@@ -79,30 +84,30 @@ spec:
 
 [,sh,subs="attributes",role=execute]
 ----
-oc apply -f bootstrap/templates/travel-agency/cars-svc.yaml
+oc apply -f ./cars-svc.yaml
 ----
 
 On the left side of the console, click to expand *Networking -> Services* and select the just create service `cars-vm`.
 Click the *Pods tab* and notice that the virtual machine has already registered with the service object.
 This will allow applications within the OpenShift cluster to access this virtual machines through the `cars-vm` Service, aka "load balancer".
 
-Now we create the remaining services for the other VMs with a script:
+Now we create the remaining services for the other VMs:
 
 [,sh,subs="attributes",role=execute]
 ----
-oc apply -f bootstrap/templates/travel-agency/deploy-vm-services.yaml
+oc apply -f ./services/
 ----
 
 ## Task 3: Validate the communication between VMs
 
 Now that all VMs have related services, they can connect to each other. 
-We validate the communication between the VMs by sending a booking request to the central `travels` API service. This service is sending requests to other VMs (flights, hotels, cars etc.) and is aggregating the response.
+We validate the communication between the VMs by sending an internal booking request to the central `travels` API service. This service is then sending requests to other VMs (flights, hotels, cars etc.) and is aggregating the response.
 
-Go to *Workloads-Pods* and click on one of the `virt-launcher-*` VM pods.
+Go to *Workloads -> Pods* and click on one of the `virt-launcher-*` VM pods.
 
-image::vm-launcher-pods.png[]
+image::vm-launcher-pods.png[link="self",window=_blank]
 
-Click on the *Terminal* tab and execute the following curl command:
+Click on the `Terminal` tab and execute the following curl command:
 
 [,sh,subs="attributes",role=execute]
 ----
@@ -116,7 +121,9 @@ You should receive a response from the travels service similar to this:
 {"city":"London","coordinates":null,"createdAt":"2025-03-19T13:47:55Z","status":"Valid","flights":[{"airline":"Red Airlines","price":1018},{"airline":"Blue Airlines","price":368},{"airline":"Green Airlines","price":318}],"hotels":[{"hotel":"Grand Hotel London","price":590},{"hotel":"Little London Hotel","price":116}],"cars":[{"carModel":"Sports Car","price":1090},{"carModel":"Economy Car","price":336}],"insurances":[{"company":"Yellow Insurances","price":325},{"company":"Blue Insurances","price":74}]}
 ----
 
-image::vm-curl-response.png[]
+image::vm-curl-response.png[link="self",window=_blank]
+
+NOTE: We have established the communication between our services and VMs. But the services are not reachable from outside the cluster.
 
 ## Task 4: Set Up External Access with Routes
 
@@ -153,14 +160,14 @@ Now let us test the Route.
 export TRAVELS_ROUTE=$(oc get route travels-vm -o jsonpath='{.spec.host}' -n travel-agency)
 ----
 
-Make an API call:
+And make an external API call to the travels service:
 
 [,sh,role=execute]
 ----
 curl -v http://$TRAVELS_ROUTE/travels/London
 ----
 
-The result should look like this:
+We should get the same result as before:
 
 [,sh,]
 ----
@@ -212,7 +219,7 @@ spec:
 
 . *Click Create* 
 
-### Validate that Internet Access is Blocked from the cars-vm virtual machine
+### Validate that the Internet Access is Blocked from the cars-vm virtual machine
 
 . Go back to *Virtualization -> VirtualMachines -> cars-vm -> Console*
 Click into the console and try to access the internet.
@@ -234,7 +241,7 @@ Click into the console and try to access the internet from here. This should wor
 curl http://www.google.com
 ----
 
-image::vm-curl-response-working.png[]
+image::vm-curl-response-working.png[link="self",window=_blank]
 
 ## Congratulations
 
