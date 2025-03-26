@@ -317,7 +317,14 @@ Please note that `VirtualMachinePool` is a Dev Preview feature of OpenShift Virt
 
 A VirtualMachinePool tries to ensure that a specified number of VirtualMachine replicas and their respective VirtualMachineInstances are in the ready state at any time. In other words, a VirtualMachinePool makes sure that a VirtualMachine or a set of VirtualMachines is always up and ready.
 
-First we are going to delete the existing `control-vm` Virtual Machine and replace it with a `VirtualMachinePool` configuration.
+First we are going to delete the existing `control-vm` Virtual Machine:
+
+[,sh,subs="attributes",role=execute]
+----
+oc delete vm control-vm -n travel-control
+----
+
+And replace it with a `VirtualMachinePool` configuration.
 
 The actual interesting parts are the `spec.replicas` and the `matchLabels` selectors. In this case we want to have 2 replicas of this VM running at any time.
 
@@ -366,7 +373,7 @@ Now let's apply the `VirtualMachinePool` configuration:
 oc apply -f ./vm-pool.yaml
 ----
 
-Go to *Virtualization -> VirtualMachines* in the `travel-control` namespace and you should see two instances of the control-vm running.
+Go to *Virtualization -> VirtualMachines* in the `travel-control` namespace and you should see two instances of the control-vm coming up.
 
 image::vm-pool.png[link="self",window=_blank]
 
@@ -405,6 +412,19 @@ oc apply -f ./vm-pool-hpa.yaml
 ----
 
 Now the `HorizontalPodAutoscaler` will scale up instances if the CPU utilization exceeds 50%.
+
+You should see 8 additional VMs spinning up...
+
+image::vms-hpa.png[link="self",window=_blank]
+
+We clean up by deleting the `HorizontalPodAutoscaler` and scaling down the `VirtualMachinePool` to 1 replica:
+
+[,sh,subs="attributes",role=execute]
+----
+oc delete hpa vm-pool-hpa -n travel-control
+
+oc patch virtualmachinepool travel-control-vm-pool --type merge --patch '{"spec":{"replicas":1}}'
+----
 
 ## Congratulations
 
