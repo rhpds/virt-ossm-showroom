@@ -6,13 +6,13 @@ This lab will take you through the use case of a _Travel Agency_ organization wh
 And some of the application components are already containerized. 
 
 In this lab you are going to expand and extend the capabilities of Virtual Machines in the cloud-native world.
-You will be introduced to technologies like Service Mesh and GitOps as well as providing a self-service portal with Red Hat Developer Hub. In addition you will learn how to integrate VMs ... 
+You will be introduced to technologies like Service Mesh and GitOps as well as providing a self-service portal with Red Hat Developer Hub. 
 
-Having the Virtual machines running in OpenShift is not the end, it is the beginning of the cloud-native journey.
+NOTE: Having the Virtual machines running in OpenShift is not the end, it is the beginning of the cloud-native journey.
 
-== Understanding the existing application
+== Understanding the existing Travel Booking Application
 
-image::TravelDemo.png[400,1000]
+image::TravelDemo.png[400,1000,link="self",window=_blank]
 
 [NOTE]
 ====
@@ -30,12 +30,11 @@ These workloads may generate different types of traffic to imitate different rea
 The components in this namespace are running as containers.
 ====
 
-=== 2. Travel Agency Services Domain namespace
+=== 2. Travel Agency Domain namespace
 
 A second namespace called `travel-agency` will host a set of services created to provide quotes for travel. +
 A main `travels` service will be the business entry point for the travel agency. It receives a destination city and a user as parameters and it calculates all elements that compose a travel budget: airfare, lodging, car reservation and travel insurance. +
 Each service can provide an independent quote and the `travels` service must then aggregate them into a single response. Additionally, some users, like _registered_ users, can have access to special discounts, managed as well by an external service. +
-Service relations between namespaces can be described in the following diagram:
 
 [NOTE]
 ====
@@ -54,8 +53,7 @@ The `travel-control` namespace runs a _business dashboard_ with two key features
 This component will be running as a Virtual Machine. You are going to deploy it in Module 2.
 ====
 
-[link=_images/01-travels-dashboard.png,window=_blank]
-image::01-travels-dashboard.png[]
+image::01-travels-dashboard.png[link="self",window=_blank]
 
 === Travel Portal and Travel Agency flow
 
