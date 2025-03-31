@@ -6,3 +6,4 @@ You have already experienced the ease with which a VM can be enhanced with featu
 
 In the next scenario you will be going further by configuring resilliency, fault-tolerance and automation of deploying and managing multiple versions of your Virtual Machines.
 
+Continue now to Module 4 - _Resilience, Scalability and Fault Aversion for VMs in a Cloud Native manner_ 
