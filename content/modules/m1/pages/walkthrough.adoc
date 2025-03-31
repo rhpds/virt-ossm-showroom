@@ -18,29 +18,39 @@ cd $HOME/virt-ossm-workspace/lab-1
 
 ## Task 1: Explore the deployed Virtual Machines
 
+====
 View the overall health of your OpenShift Virtualization environment in the web console by navigating to the *Home -> Overview* page in the OpenShift Container Platform web console. 
 The Status card displays the overall health of OpenShift Virtualization based on the alerts and conditions.
 
 image::vm-health-overview.png[link="self",window=_blank]
+====
 
+====
 Now navigate to *Virtualization -> VirtualMachines*.
 You will see the list of running VMs in the travel-agency namespace:
 
 image::vms-overview.png[link="self",window=_blank]
+====
 
+====
 Click on the `cars-vm`, this directs you to the details of this VM.
 You can explore the configuration (storage, networking, hardware devices, users etc.) of this VM and also use the `Console` tab to login to the VM.
 
 image::vm-detail.png[link="self",window=_blank]
+====
 
+====
 Click on the `Metrics` tab. 
 This gives you an overview of the VM metrics, like memory and cpu consumption, storage and networking data.
 
 image::vm-metrics.png[link="self",window=_blank]
+====
 
+====
 Now click on the link `Virtualization dashboard` on the top right of the page and explore the Prometheus dashboard.
 
 image::vm-metrics-dashboard.png[link="self",window=_blank]
+====
 
 So far we have explored the Virtualization Dashboard in the OpenShift console and some of the out of the box available observability features in OpenShift for VMs.
 
@@ -96,9 +106,12 @@ spec:
 oc apply -f ./cars-svc.yaml
 ----
 
-On the left side of the console, click to expand *Networking -> Services* and select the just create service `cars-vm`.
+====
+On the left side in the OpenShift Web Console, click *Networking -> Services* and select the just created service `cars-vm`.
 Click the *Pods tab* and notice that the virtual machine has already registered with the service object.
+
 This will allow applications within the OpenShift cluster to access this virtual machines through the `cars-vm` Service, aka "load balancer".
+====
 
 Now we create the remaining services for the other VMs:
 
@@ -112,11 +125,14 @@ oc apply -f ./services/
 Now that all VMs have related services, they can connect to each other. 
 We validate the communication between the VMs by sending an internal booking request to the central `travels` API service. This service is then sending requests to other VMs (flights, hotels, cars etc.) and is aggregating the response.
 
+====
 Go to *Workloads -> Pods* and click on one of the `virt-launcher-*` VM pods.
 
 image::vm-launcher-pods.png[link="self",window=_blank]
+====
 
 Click on the `Terminal` tab and execute the following curl command:
+
 
 [,sh,subs="attributes",role=execute]
 ----
@@ -125,9 +141,11 @@ curl -v http://travels-vm.travel-agency.svc.cluster.local:8000/travels/London
 
 You should receive a response from the travels service similar to this:
 
-[,sh,]
+[,JSON,]
 ----
-{"city":"London","coordinates":null,"createdAt":"2025-03-19T13:47:55Z","status":"Valid","flights":[{"airline":"Red Airlines","price":1018},{"airline":"Blue Airlines","price":368},{"airline":"Green Airlines","price":318}],"hotels":[{"hotel":"Grand Hotel London","price":590},{"hotel":"Little London Hotel","price":116}],"cars":[{"carModel":"Sports Car","price":1090},{"carModel":"Economy Car","price":336}],"insurances":[{"company":"Yellow Insurances","price":325},{"company":"Blue Insurances","price":74}]}
+{"city":"London","coordinates":null,"createdAt":"2025-03-19T13:47:55Z","status":"Valid",
+"flights":[{"airline":"Red Airlines","price":1018},{"airline":"Blue Airlines","price":368},{"airline":"Green Airlines","price":318}],"hotels":[{"hotel":"Grand Hotel London","price":590},{"hotel":"Little London Hotel","price":116}],
+"cars":[{"carModel":"Sports Car","price":1090},{"carModel":"Economy Car","price":336}],"insurances":[{"company":"Yellow Insurances","price":325},{"company":"Blue Insurances","price":74}]}
 ----
 
 image::vm-curl-response.png[link="self",window=_blank]
@@ -178,9 +196,10 @@ curl -v http://$TRAVELS_ROUTE/travels/London
 
 We should get the same result as before:
 
-[,sh,]
+[,JSON,]
 ----
-{"city":"London","coordinates":null,"createdAt":"2025-03-19T13:47:55Z","status":"Valid","flights":[{"airline":"Red Airlines","price":1018},{"airline":"Blue Airlines","price":368},{"airline":"Green Airlines","price":318}],"hotels":[{"hotel":"Grand Hotel London","price":590},{"hotel":"Little London Hotel","price":116}],"cars":[{"carModel":"Sports Car","price":1090},{"carModel":"Economy Car","price":336}],"insurances":[{"company":"Yellow Insurances","price":325},{"company":"Blue Insurances","price":74}]}
+{"city":"London","coordinates":null,"createdAt":"2025-03-19T13:47:55Z","status":"Valid",
+"flights":[{"airline":"Red Airlines","price":1018},{"airline":"Blue Airlines","price":368},{"airline":"Green Airlines","price":318}],"hotels":[{"hotel":"Grand Hotel London","price":590},{"hotel":"Little London Hotel","price":116}],"cars":[{"carModel":"Sports Car","price":1090},{"carModel":"Economy Car","price":336}],"insurances":[{"company":"Yellow Insurances","price":325},{"company":"Blue Insurances","price":74}]}
 ----
 
 Routes are implemented by HAProxy inside OpenShift.
@@ -205,6 +224,7 @@ In this step, you will test blocking egress access from the `cars-vm` virtual ma
 
 ### Implement a Network Policy to Block Egress
 
+====
 . On the left side, click *Networking -> NetworkPolicies -> Create NetworkPolicy*.
 
 . Select the *YAML* View radio button.
@@ -226,24 +246,28 @@ spec:
    - Egress
 ----
 
-. *Click Create* 
+*Click Create* 
+====
 
 ### Validate that the Internet Access is Blocked from the cars-vm virtual machine
 
+====
 . Go back to *Virtualization -> VirtualMachines -> cars-vm -> Console*
-Click into the console and try to access the internet.
+Login to the console and try to access the internet.
 
 [,sh,role=execute]
 ----
 curl http://www.google.com
 ----
 
-The egress to Internet connection has been denied with a timeout.
+NOTE: The egress to Internet connection has been denied with a timeout.
+====
 
 Now test the same from one of the other VMs.
 
+====
 . Go to *Virtualization -> VirtualMachines -> travels-vm -> Console*
-Click into the console and try to access the internet from here. This should work!
+Login to the console and try to access the internet from here. This should work!
 
 [,sh,role=execute]
 ----
@@ -251,8 +275,9 @@ curl http://www.google.com
 ----
 
 image::vm-curl-response-working.png[link="self",window=_blank]
+====
 
-Now clean up by deleting the `NetworkPolicy`:
+Now we clean up by deleting the `NetworkPolicy`:
 
 [,sh,role=execute]
 ----
