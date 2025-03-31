@@ -1,13 +1,25 @@
 # Module 4: Resilience, Scalability and Fault Aversion for VMs in a Cloud Native manner
 
+NOTE: All assets for this module are in the folder `lab-4`. Please change the directory into this folder.
 
-## Task 1: Expose VMs to public requests
+[,sh,subs="attributes",role=execute]
+----
+cd $HOME/virt-ossm-workspace/lab-4
+----
 
-In the previous module you deployed and secured the _Travel Agency_ solution but there is no access to it. In a traditional environment in order to enable access to a VM from the public internet you would need to open tickets for firewall rules, loadbalancers, external DNS etc. however in the current environment networking can be defined between OpenShift and service mesh.
+## Task 1: Expose the Business Dashboard VM
 
-Openning the URL to the _Ingress Gateway_ (the mesh component used to control incoming traffic) at http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[window=_blank] does not return the _Travel Agency_ dashboard page. This is expected as we have not yet exposed any services from the mesh. 
+In the previous module you deployed and secured the _Travel Booking_ application but currently there is no access to it. 
 
-Exposing the _Travel Agency_ dashboard to the outside world via the mesh _Ingress Gateway_ (find more extensive information in the documentation https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/service_mesh/index#ossm-routing-traffic[Managing traffic in your service mesh, window=_blank] ) requires the addition of the following Custom Resources (CRs) to configure the traffic flow:
+NOTE: Traditionally we would need to open tickets for firewall rules, loadbalancers, external DNS etc. in order to make the dashboard accessable from the Internet. However in the current environment, networking can be defined within OpenShift and Service Mesh.
+
+====
+Open the URL to the Service Mesh _Ingress Gateway_ at http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[window=_blank]
+
+It does not return a page. This is expected as we have not yet exposed any services from the mesh. 
+====
+
+Exposing the _Travel Booking_ dashboard to the outside via the _Ingress Gateway_ requires the addition of the following Custom Resources (CRs):
 
 * https://istio.io/latest/docs/reference/config/networking/gateway/[`Gateway`, window=_blank]: A load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections.
 
@@ -15,31 +27,36 @@ Exposing the _Travel Agency_ dashboard to the outside world via the mesh _Ingres
 
 * https://istio.io/latest/docs/reference/config/networking/destination-rule/[`DestinationRule`, window=_blank]: Defines policies (loadbalancing, retries, failover, security) that apply to traffic intended for a service after routing has occurred.
 
-Execute script {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/expose-control-vm.sh[expose-control-vm.sh, window=_blank] in the *Terminal*  to deploy these configurations:
-
-[,sh,subs="attributes",role=execute]
-----
-cd $HOME/virt-ossm-workspace/lab-4
-----
+Execute the script {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/expose-control-vm.sh[expose-control-vm.sh, window=_blank] in the *Terminal*  to deploy these configurations:
 
 [,sh,subs="attributes",role=execute]
 ----
 ./expose-control-vm.sh {openshift_cluster_ingress_domain}
 ----
 
-Refresh the URL to the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}[window=_blank] and you should be served with the familiar _Travel Agency_ UI. *Congratulations your solution is public!*.
+====
+Refresh the URL of the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}[window=_blank] and you should be served with the familiar _Travel Booking_ Dashboard. 
+====
 
-After a brief time the `Kiali` also shows the traffic flowing via the `istio-ingressgateway` towards the `control-vm`.
+*Congratulations your solution is public!*.
+
+====
+After a brief time, `Kiali` also shows the traffic flowing via the `istio-ingressgateway` towards the `control-vm`.
 
 image::01-m4-t1-ingress-control.gif[link=self, window=blank]
+====
 
-## Task 2: Perform a Canary Release of a new versions of a _Virtual Machine_ application
+## Task 2: Deploying a new application (VM) version with a Canary Release
 
-Often you will be required to deploy and maintain multiple versions of an application to provide new features to a subset of customers. In this occasion you will be releasing *v2* of the *cars-vm* allowing *10%* of new customer requests to access the new service whilst the remainder will continue to go to *v1*. If all goes well you will increase the traffic to *v2* to *80%*.
+Often you will be required to deploy and maintain multiple versions of an application to provide new features to a subset of customers. 
 
-In order to achieve this you are going to first deploy a new Virtual Machine `cars-vm-v2-a` with `version=v2` (see {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-a.yaml#L38[cars-vm-v2-a.yaml,window=_blank]).
+. In this Task, you will be releasing a new version *v2* of the *cars-vm* component, allowing *10%* of new customers to access this new service, whilst the remainder will continue to use version *v1*. 
 
-Then you need to configure the mesh traffic with a `DestinationRule` which will direct traffic destined for the `cars-vm` service to both `v1` and `v2` VMs based on their `version=v??` label (see {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/multipleversions-for-car-vm-in-the-mesh.sh#L30-L36[multipleversions-for-car-vm-in-the-mesh.sh,window=_blank]).
+. If everything goes well, you will gradualy increase up to *80%* of the traffic to version *v2*.
+
+. In order to achieve this, you are going to deploy a new Virtual Machine with the name `cars-vm-v2-a` and a label `version=v2` (see details {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-a.yaml#L38[here,window=_blank]).
+
+. Then you need to configure a `DestinationRule` to be able to direct the traffic to both versions of the `cars-vm` service. (see details {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/multipleversions-for-car-vm-in-the-mesh.sh#L30-L36[here,window=_blank]).
 
 [source,yaml,subs=attributes]
 ----
@@ -61,7 +78,7 @@ spec:
       name: v2
 ----
 
-Finally define a `VirtualService` which splits the traffic so that `90%` of the traffic reaches `v1` and `10%` to the new `cars-vm-v2-a` (which is `v2`).
+. And finally you define the `VirtualService` which splits the traffic so that `90%` of the traffic reaches `v1` and `10%` goes to the new service `cars-vm-v2-a` with version `v2`.
 
 [source,yaml,subs=attributes]
 ----
@@ -89,66 +106,101 @@ spec:
           weight: 10
 ----
 
-NOTE: We will deliver the above via the attached terminal but you could as easily have used `Kiali` to define the configurations.
+NOTE: You could also use `Kiali` to define the configurations. In this case we are using a script.
 
-Execute the script below in the *Terminal* which delivers the above configurations:
+Now execute the script below which delivers all the above configurations:
 
 [,sh,subs="attributes",role=execute]
 ----
 ./multipleversions-for-car-vm-in-the-mesh.sh 90 10
 ----
 
-`Kiali` *Istio Config* will now list under `travel-agency` the new traffic management configurations.
+====
+Got to your `Kiali` Dashboard.
+
+Click on *Istio Config*. This will now list the new traffic management configurations under the `travel-agency` namespace.
 
 image::01-m4-t1-kiali-config.png[link=self, window=blank]
+====
 
-
-Shortly after creating the traffic configuration you will start seeing the result of the traffic split in the `Kiali` console as the following animated guide also shows.
+====
+Shortly after creating the traffic configuration you will start seeing the result of the traffic split in the `Kiali` graph as the following animated image also shows.
 
 image::02-m4-t2-separate-v1-v2-traffic.gif[link=self, window=blank]
+====
 
-After you have verified the new version is stable go ahead and increase traffic routing for `v2` to `80%`.
+After you have verified the new version is stable go ahead and increase the traffic routing for version `v2` to `80%`.
 
 [,sh,subs="attributes",role=execute]
 ----
 ./multipleversions-for-car-vm-in-the-mesh.sh 20 80
 ----
 
-The config in `Kiali` has been updated (see https://kiali-istio-system.{openshift_cluster_ingress_domain}/console/namespaces/travel-agency/istio/virtualservices/cars[cars `VirtualService`, window=_blank]) and soon the graph should show `80%` traffic flowing to `v2`. 
+====
+The *Istio config* in `Kiali` has been updated (see https://kiali-istio-system.{openshift_cluster_ingress_domain}/console/namespaces/travel-agency/istio/virtualservices/cars[cars `VirtualService`, window=_blank]) and soon the Graph should show `80%` traffic flowing to version `v2`. 
+====
 
-## Task 3: Circuit Breakers
+## Task 3: Implementing a Circuit Breaker
 
-The new metrics visualisation can enable business teams to understand the level of load the solution receives and make appropriate operational decisions. In order to cater for a 50% increase in traffic to the newly released `v2` service of `cars-vm-v2` configure the solution in the mesh so that:
+The new metrics visualisation with `Kiali` and `Grafana` help business teams to better understand the level of load in terms of networking requests the solution receives, and make appropriate operational decisions. The overall goal is now to make the application more resilient. 
 
-* you double the service capacity,
-* guarantee high availability of requests to the `cars-vm` service, and
-* ensure any failures do not impact end-user requests.
+[NOTE]
+====
+Let's assume the following scenario:
 
-Service mesh in order to provide resillience to the included services implements Netflix like features. You can take advantage of the https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[_circuit breaker_, window=_blank] feature of the mesh to achieve the required resillience in the network of VMs/containers making up the Travel Agency solution.
+The previous release of the new version `v2` of the `cars-vm` service was very successfull. 
+We see an increase of 50% of traffic for this service.
 
-First, deploy an additional VM {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`] that will also be exposed as part of `cars-vm` service (together with `cars-vm` and `cars-vm-v2-a`). It will also be labelled with version *v2* hence making requests towards *v2* hightly available between the `cars-vm-v2-a` and `cars-vm-v2-b` VMs.
+In order to cope with this, the platform team is confronted with the following requirements:
 
-Execute the following to deploy the new VM {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`,window=_blank].
+* The service capacity for the `cars-vm` service should be doubled (scale out),
+* Guarantee high availability of requests to the `cars-vm` service
+* Ensure any failures do not impact end-user requests. No cascading failures.
+====
+
+Good news. You can take advantage of the https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[Circuit Breaker, window=_blank] feature of OpenShift Service Mesh to achieve the required resillience features.
+
+[NOTE]
+====
+++++
+<details>
+  <summary style=""><b>About Circuit Breaker</b></summary>
+  <p style="color:black;">The circuit breaker is an important pattern, used in environments with high traffic volumes and many destinations which offer the ability to loadbalance requests to multiple services, as it creates resilient microservice applications. Circuit breaking allows service mesh networking, like in an electric circuit, to monitor the healthiness of all destinations and stop using one of the *version=v2* VMs if it starts failing, hence limiting the impact of failures and latency spikes to the end user. </</p>
+</details>
+++++
+====
+
+* First, you deploy an additional VM with the name {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-b.yaml[`cars-vm-v2-b`].
+
+* This VM will also be exposed as part of `cars-vm` service as we apply the same label version *v2*. This way we achieve high availability.
+
+Apply the following resource to deploy the new {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/cars-vm-v2-b.yaml[`VM`,window=_blank].
 
 [,sh,subs="attributes",role=execute]
 ----
 oc apply -f cars-vm-v2-b.yaml -n travel-agency
 ----
 
-After deploying the new `cars-vm-v2-b` VM you should notice in `Kiali` that `cars-vm` has now 3 destinations and traffic destined for `v2` will be split almost equally at `40%` between the `v2` instances. *Congratulations* you have achieved high availability for requests on *version=v2*. It was not so difficult after all!!
+====
+After deploying the new VM you should notice in `Kiali` that `cars-vm` has now 3 destinations and traffic destined for `v2` will be split almost equally at `40%` between both `v2` instances. 
+
+*Congratulations* you have achieved high availability for requests on *version=v2*. It was not so difficult after all!!
 
 image::03-m4-t3-2-v2-endpoints.png[link=self, window=blank]
+====
 
-Once the VM is up and running configure the https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[_circuit breaker_, window=_blank] in the mesh so that if there is a problem on either of the 2 *version=v2* VMs the mesh will stop directing traffic to it until it has recovered. 
+* After the new VM is up and running, we are now configuring the https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[_circuit breaker_, window=_blank] pattern.
+
+* If there is a problem on either of the 2 *version=v2* VMs, the service mesh will stop forwarding traffic to it until the service has recovered. 
+
+Now apply the {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/circuit-breaker.sh#L54-L66[circuit-breaker.sh, window=_blank] script:
 
 [,sh,subs="attributes",role=execute]
 ----
 ./circuit-breaker.sh
 ----
 
-See the circuit breaker applied at {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-4/circuit-breaker.sh#L54-L66[circuit-breaker.sh, window=_blank], you will notice that in the case of a `5xx` error the mesh will eject the VM that causes the issue for `3 minutes`. 
-
-The https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/[circuit breaker, window=_blank] is an important pattern, used in environments with high traffic volumes and many destinations which offer the ability to loadbalance requests to multiple services, as it creates resilient microservice applications. Circuit breaking allows service mesh networking, like in an electric circuit, to monitor the healthiness of all destinations and stop using one of the *version=v2* VMs if it starts failing, hence limiting the impact of failures and latency spikes to the end user. 
+NOTE: You will notice that in the case of a `5xx` error, the service mesh will eject the VM that causes the issue for `3 minutes`. 
 
 Check that `Kiali` contains an updated version of the https://kiali-istio-system.{openshift_cluster_ingress_domain}/console/namespaces/travel-agency/istio/destinationrules/cars[*cars* `DestinationRule`, window=_blank] containing the circuit breaker. 
 
