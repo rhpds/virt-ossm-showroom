@@ -26,6 +26,7 @@ First we create a new OpenShift project (namespace) for this Virtual machine:
 oc new-project travel-control
 ----
 
+====
 Then go to *Virtualization -> VirtualMachines -> Create*
 
 Select `With YAML` and replace the content with the following:
@@ -141,6 +142,7 @@ spec:
 ----
 
 Click on *Create*.
+====
 
 The Virtual Machine instance is going to be provisioned now.
 After a minute or two, the VM should be up and running:
@@ -205,9 +207,11 @@ oc apply -f ./control-route.yaml
 
 NOTE: You can access the dashboard now through https or http as we have configured TLS with edge termination.
 
+====
 Go to *Networking -> Routes* and click on the URL in the *Location* column.
 
 image::route.png[link="self",window=_blank]
+====
 
 Or use the CLI to get the URL:
 
@@ -216,10 +220,13 @@ Or use the CLI to get the URL:
 echo "$(oc get route travel-control -o jsonpath='{.spec.host}' -n travel-control)"
 ----
 
-Open the Dashboard and explore the features. 
-You can now adjust the settings (Request Ratio, Travel Type etc.) of each travel portal by using the sliders. 
+====
+Open the Business Dashboard and explore the features. 
+
+You can now *adjust the settings (Request Ratio, Travel Type etc.) of each travel portal* by using the sliders. 
 
 image::travel-dashboard.png[link="self",window=_blank]
+====
 
 NOTE: *Congratulations!!*
 You helped the Travel Agency company to have their complete Booking system running in OpenShift with VMs alongside containers.
@@ -265,6 +272,7 @@ Therefore we want to increase the cpu and memory.
 The VM instance is currently configured with 1 cpu and 2GB of memory. 
 Let us validate this.
 
+====
 Got to *Virtualization -> VirtualMachines -> control-vm*
 
 Click on the *Console* tab and login to the VM.
@@ -285,20 +293,25 @@ free
 ----
 
 image::free-memory.png[link="self",window=_blank]
+====
 
+====
 Now click on the *Configuration* tab, scroll down and click on `CPU | Memory`
 
-image::increase-resources.png[link="self",window=_blank]
+Select *2 vCPU and 4GB of Memory* and click *Save*. 
 
-Select 2 vCPU and 4GB of Memory and click on *Save*. 
+image::increase-resources.png[link="self",window=_blank]
+====
 
 Now we see that the VM has pending changes. In order to get the changes applied, we need to restart the VM.
 
 image::pending-changes.png[link="self",window=_blank]
 
+====
 Click on the top right dropdown menu *Actions -> Restart*
 
-After the VM is restarted, log back in and check the cpu and memory.
+After the VM is restarted, log back in and check the cpu and memory again.
+====
 
 NOTE: OpenShift Virtualization also supprts Live Migration when increasing resources, so it can migrate VMs across nodes for better resource utilization. The underlying node must have enough available resources for scaling up.
 
@@ -373,19 +386,25 @@ Now let's apply the `VirtualMachinePool` configuration:
 oc apply -f ./vm-pool.yaml
 ----
 
+====
 Go to *Virtualization -> VirtualMachines* in the `travel-control` namespace and you should see two instances of the control-vm coming up.
 
 image::vm-pool.png[link="self",window=_blank]
+====
 
+====
 Select one of the VMs and delete it!
 
 image::delete-vm.png[200,400,link="self",window=_blank]
+====
 
+====
 Open the _business dashboard_ and validate that it is still working.
 
 You will also recognize that the control-vm is *automatically recreated*.
+====
 
-NOTE: It is also possible to autoscale Virtual Machines by using a HorizontalPodAutoscaler (HPA) with a VirtualMachinePool.
+IMPORTANT: It is also possible to autoscale Virtual Machines by using a HorizontalPodAutoscaler (HPA) with a VirtualMachinePool.
 
 Simply reference it in the spec of the autoscaler:
 
@@ -413,6 +432,7 @@ oc apply -f ./vm-pool-hpa.yaml
 
 Now the `HorizontalPodAutoscaler` will scale up instances if the CPU utilization exceeds 50%.
 
+====
 Go to *Workloads -> HorizontalPodAutoscalers* and select `vm-pool-hpa`.
 
 image::vm-hpa-overview.png[link="self",window=_blank]
@@ -421,6 +441,7 @@ In the Metrics section you'll see the Current and Target Values. If the Target V
 It might look like in the next image...
 
 image::vms-hpa.png[link="self",window=_blank]
+====
 
 We clean up by deleting the `HorizontalPodAutoscaler` and scaling down the `VirtualMachinePool` to 1 replica:
 
