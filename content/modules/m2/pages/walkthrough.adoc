@@ -4,7 +4,7 @@ NOTE: All assets for this module are in the folder `lab-2`. Please change the di
 
 [,sh,subs="attributes",role=execute]
 ----
-cd lab-2
+cd $HOME/virt-ossm-workspace/lab-2
 ----
 
 ## Task 1: Complete the Travel Demo Application - Create the UI component 

@@ -13,7 +13,7 @@ NOTE: All assets for this module are in the folder `lab-1`. Please change the di
 
 [,sh,subs="attributes",role=execute]
 ----
-cd lab-1
+cd $HOME/virt-ossm-workspace/lab-1
 ----
 
 ## Task 1: Explore the deployed Virtual Machines
