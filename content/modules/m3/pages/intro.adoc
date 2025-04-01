@@ -1,12 +1,12 @@
 # Module 3: Integrating and Observing Virtual Machines in OpenShift Service Mesh
 
-In this module we are going to introduce *Red Hat OpenShift Service Mesh* and explore the added features, to elevate the experience of operating and monitoring Virtual Machines as first class citizens in a cloud native world.  
+In this module we are going to introduce *Red Hat OpenShift Service Mesh* and explore the added features, to elevate the experience of operating and monitoring Virtual Machines(VMs) as first class citizens in a cloud native world.  
 
 
 ## Objectives
 
 * Introducing OpenShift Service Mesh
-* Integrate Virtual Machines with OpenShift Service Mesh for advanced networking
+* Integrate VMs with OpenShift Service Mesh for advanced networking
 * Implement traffic management rules and review new observability features through OSSM
 
 
@@ -18,7 +18,7 @@ Red Hat OpenShift Service Mesh is an integrated service mesh solution based on _
 
 NOTE: OpenShift https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Service Mesh] is an add-on service that can be installed through an operator.
 
-Even though OpenShift Service Mesh is primarily designed for containerized workloads, it also supports virtual machines (VMs) by integrating them into the mesh. Key benefits for VMs include:
+Even though OpenShift Service Mesh is primarily designed for containerized workloads, it also supports VMs by integrating them into the mesh. Key benefits for VMs include:
 
 * *Consistent Networking & Security* – VMs can securely communicate with containerized workloads using mTLS encryption and access policies.
 * *Unified Observability* – VMs gain visibility through tracing (Jaeger), monitoring (Prometheus, Grafana), and service topology visualization (Kiali).
@@ -32,13 +32,13 @@ image::02-OSSM-Components.png[]
 
 OpenShift Service Mesh, delivered as part of the platform, adds the above cross-cutting application capabilities through the following components:
 
-* *istiod*: applies all defined policies (encryption, authorization, traffic management, observability) in the network of Virtual Machines and containers included in the mesh.
-* *envoy*: a sidecar container, of a Virtual Machines or container, with the ability to receive and apply the policies effectively makeing a Virtual Machine part of the mesh. The envoy sits side-by-side to a Virtual Machine (see the image above) and intercepts all requests coming in and out of it.
-* *Kiali*: visualises through a UI what is configured in the mesh, the network of included applications, the traffic throughut/latency, the security utilised, the issues that may occur in the configurations or netwrork, the logs and a host of other features that the mesh offers.
-* The rest of the observbility components (as seen in the image above) contain parts of what `kiali` visualises for a deeper inspection 
+* *istiod*: applies all defined policies (encryption, authorization, traffic management, observability) in the network of VMs and containers included in the mesh.
+* *envoy*: a sidecar container, of a VM or containerized workload, with the ability to receive and apply the policies effectively making a VM part of the mesh. The envoy sits side-by-side to a VM (see the image above) and intercepts all requests coming in and out of it.
+* *Kiali*: visualises through a UI what is configured in the mesh, the network of included applications, the traffic througput and latency, the security utilised, the issues that may occur in the configurations or netwrork, the logs and a host of other features that the mesh offers.
+* The rest of the observbility components (as seen in the image above) contain parts of what `kiali` visualises for a deeper inspection:
 ** `Prometheus` collects the _metrics_ emitted by the `envoy` of each container/VM in the mesh, 
-** `Jaeger` collects _traces_ of each container/VM in the mesh and draws a path (`span`) of microservices a request traversed showing the time the request spent in each microservice and success/failure state, 
+** `Jaeger` collects _traces_ of each container/VM in the mesh and draws a path (`span`) of the microservices a request traversed showing the time the request spent in each microservice and success/failure state, 
 ** `Grafana` provides additional dashboards for the operators and business analysts to review on performance, request throughput/latency, success/failures etc.
 * *Gateways*: one or more `ingress gateway` instances support traffic flow into service mesh from the outside. This is required since the mesh comes with `network policies` that disable direct access to VMs/containers in the mesh. Also an `egress gateway` respectively can control outgoing traffic from the mesh to external services.
 
-NOTE: The administrators have already done the setup of Service Mesh so lets see how easy it is to enable a a Virtual Machine to take advantage of these new capabilities.
+NOTE: The administrators of the cluster you will be using have already done the setup of Service Mesh so lets see how easy it is to enable a a VM to take advantage of these new capabilities.
