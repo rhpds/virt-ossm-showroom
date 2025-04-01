@@ -1,4 +1,4 @@
-# Module 3: Enhancing Networking with OpenShift Service Mesh (OSSM)
+# Module 3: Integrating and Observing Virtual Machines in OpenShift Service Mesh
 
 NOTE: All assets for this module are in the folder `lab-3`. Please change the directory into this folder.
 

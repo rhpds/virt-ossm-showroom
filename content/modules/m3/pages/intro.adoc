@@ -1,4 +1,4 @@
-# Module 3: Enhancing Networking & Observability with OpenShift Service Mesh (OSSM)
+# Module 3: Integrating and Observing Virtual Machines in OpenShift Service Mesh
 
 In this module we are going to introduce *Red Hat OpenShift Service Mesh* and explore the added features, to elevate the experience of operating and monitoring Virtual Machines as first class citizens in a cloud native world.  
 
