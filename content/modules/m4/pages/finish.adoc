@@ -1,4 +1,4 @@
-# Module 4: Advanced Traffic Management and Security with OpenShift Service Mesh for Virtual Machines
+# Module 4: Enhancing Traffic Resilience and Security for Virtual Machines with OpenShift Service Mesh
 
 ## Congratulations on completing this module!
 

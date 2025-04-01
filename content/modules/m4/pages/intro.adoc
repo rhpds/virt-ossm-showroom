@@ -1,11 +1,11 @@
-# Module 4: Advanced Traffic Management and Security with OpenShift Service Mesh for Virtual Machines
+# Module 4: Enhancing Traffic Resilience and Security for Virtual Machines with OpenShift Service Mesh
 
 In this module we are going to explore how you can further make the solution secure and robust whilst exposing it to the outside world. You will ensure that your Virtual Machine (VM) based solution can recover from failures of a VM without having to intervene to manage that as well cater for the release of a new version of a VM component.
 
 
 ## Objectives
 
-* Expose Virtual Machines for public consumption via service mesh `ingress gateway`.
+* Expose VMs for public consumption via service mesh `ingress gateway`.
 * Perform a https://en.wikipedia.org/wiki/Feature_toggle#Canary_release[canary release deployment, window=_blank] of a new version on one of the VMs, run it in parallel to the original and define % of traffic to flow on each version.
 * Create policies with the help of service mesh to exclude instances of your VMs when they are unresponsive in order to ensure any failures do not impact end-user requests.
 * Apply restrictions for business and security purposes via authorization policies.
