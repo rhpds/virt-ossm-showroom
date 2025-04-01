@@ -1,7 +1,9 @@
-# Module 4: Resilience, Scalability and Fault Aversion for VMs in a Cloud Native manner
+# Module 4: Enhancing Traffic Resilience and Security for Virtual Machines with OpenShift Service Mesh
 
 ## Congratulations on completing this module!
 
-You have experienced a host of capabilities your VMs have gained by moving into this Cloud Native world already. In the next scenario you will be automating the delivery of these configurations so that they can be monitored and applied as your needs change in a declarative rather than imerative manner by the a tool called `ArgoCD`.
+You have experienced a host of capabilities your VMs have gained by moving into this Cloud Native world already. In the next scenario you will be automating the delivery of these configurations so that they can be monitored and applied as your needs change in a declarative rather than imperative manner by using _OpenShift GitOps_.
+
+Continue now to Module 5 - _Declarative Management of VMs with OpenShift GitOps_ 
 
 

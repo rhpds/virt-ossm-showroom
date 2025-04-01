@@ -1,4 +1,4 @@
-.Module 4: Resilience, Scalability and Fault Aversion for VMs in a Cloud Native manner 
+.Module 4: Enhancing Traffic Resilience and Security for Virtual Machines with OpenShift Service Mesh
 * xref:intro.adoc[Introduction]
 * xref:walkthrough.adoc[Walkthrough]
 * xref:finish.adoc[Finish]
