@@ -1,4 +1,4 @@
-# Module 4: Resilience, Scalability and Fault Aversion for VMs in a Cloud Native manner
+# Module 4: Advanced Traffic Management and Security with OpenShift Service Mesh for Virtual Machines
 
 NOTE: All assets for this module are in the folder `lab-4`. Please change the directory into this folder.
 
@@ -202,9 +202,12 @@ Now apply the {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main
 
 NOTE: You will notice that in the case of a `5xx` error, the service mesh will eject the VM that causes the issue for `3 minutes`. 
 
-Check that `Kiali` contains an updated version of the https://kiali-istio-system.{openshift_cluster_ingress_domain}/console/namespaces/travel-agency/istio/destinationrules/cars[*cars* `DestinationRule`, window=_blank] containing the circuit breaker. 
+Lets test the circuit breaker by the forcing an issue in the `cars-vm-v2-b` VM.
 
-Lets force an issue in `cars-vm-v2-b` VM by going in the OpenShift console to the `cars-vm-v2-b` (see below) access the console of the VM and execute the following to stop the car application running in the VM.
+====
+Go in the OpenShift console to *Virtualization -> VirtualMachines -> cars-vm-v2-b* virtual machine and login to the *Console*. 
+
+Execute the following command in the terminal of the guest machine to stop the car workload running in the VM.
 
 [,sh,subs="attributes",role=execute]
 ----
@@ -212,25 +215,40 @@ systemctl --user stop cars.service
 ----
 
 image::04-m4-t3-select-vm.png[link=self, window=blank]
+====
 
+====
+Now you see that the failing *version=v2* endpoint will be removed and no more requests will flow once it has detected the `5xx` failures. 
 
-As a result the *version=v2* endpoint for the failing VM will be removed by the service mesh and no more requests will flow once it has detected the `5xx` failures. The exclusion lasts per configuration in the https://kiali-istio-system.{openshift_cluster_ingress_domain}/console/namespaces/travel-agency/istio/destinationrules/cars[`cars DestinationRule`, window=_blank] for `180s` upon which it will be retried and if failed it will again be excluded. If you renable the application by executing `systemctl --user start cars.service`, in the `cars-vm-v2-b` VM console, traffic for `v2` will again start being loadbalanced between the 2 VMs. All of these scenarios are showcased in the animated image below, or alterniatvely you can try them monitor in the system and `Kiali` console.
+This exclusion lasts per configuration for `180s` or 3 minutes upon which it will be retried and if failed it will again be excluded. 
+
+NOTE: If you restart the workload by executing `systemctl --user start cars.service`, the traffic for `v2` will again start being loadbalanced between the 2 VMs. 
 
 image::05-m4-t3-circuit-breaker.gif[link=self, window=blank]
+====
 
-*Contratulations* for helping _Travel Agency_ to make the solution as resillient as Netflix.
+*Contratulations* for helping the _Travel Agency_ company to make the solution as resillient as Netflix.
 
+## Task 4: Restricting Access to services with Authorization Policies
 
-## Task 4: Apply business restrictions with service authorization policies
+Although security features such as *traffic encryption* are by default applied in the mesh, other practices such as access rules on what is a service's visibility and who can access them are not applied by default. This can have a two-fold effect:
 
-Although security features such as encryption are by default applied in the mesh other practices such as rules on what is a service's visibility and who can access them are not applied. This can have a two-fold effect. 
+* Services that are bad actors deployed by 3rd party in the cluster can gain access to a sensitive service,
+* The amount of all possible destinations in a very large cluster can make the configuration of `istio-proxy` sidecar very large, causing evictions and possible cluster instability.
 
-* Services that are bad actors deployed by 3rd party in the cluster can gain access to a sensiteve service,
-* Configuration of all possible destinations in a very large cluster can make the `istio-proxy` sidecar very large causing evictions and possible cluster instability.
+In order to counter these possible issues, you can apply `AuthorizationPolicy` resources and visibility restrictions based on the principal (the service identification) included in the exchanged certificate.
 
-In order to counter these possible issues you can apply within the service mesh authorization and visibility restrictions based on that principal included in the exchanged certificate.
+[NOTE]
+====
+++++
+<details>
+  <summary style=""><b>About Authorization Policies</b></summary>
+  <p style="color:black;">The authorization policy enforces access control to the inbound traffic in the server side Envoy proxy. Each Envoy proxy runs an authorization engine that authorizes requests at runtime. When a request comes to the proxy, the authorization engine evaluates the request context against the current authorization policies, and returns the authorization result, either ALLOW or DENY. Operators specify Istio authorization policies using .yaml files. </</p>
+</details>
+++++
+====
 
-First apply the https://istio.io/latest/docs/ops/best-practices/security/#use-default-deny-patterns[best practice, window=_blank] `default deny all` policy. 
+First you apply a https://istio.io/latest/docs/ops/best-practices/security/#use-default-deny-patterns[default deny all, window=_blank] policy which is a best practise. 
 
 [,sh,subs="attributes",role=execute]
 ----
@@ -251,14 +269,19 @@ spec:
   {}" | oc apply -f -  
 ----
 
-This will result in all services of the _Travel Agency_ to stop communicating with each other as they no longer have permission to do so (see `Kiali` Graph for the failures). You can confirm the effect by accessing the http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[Travel Agency Dashboard, window=_blank] which now returns `RBAC: access denied`.
+Now all services of the _Travel Booking_ application stop communicating with each other as they no longer have permission to do so (see also `Kiali` Graph for the failures). 
 
-Then apply fine grained `AuthorizationPolicies` which will allow communications between: 
+NOTE: You can confirm the effect by accessing the http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[Travel Booking Dashboard, window=_blank] which now returns `RBAC: access denied`.
 
-* `istio-ingressgateway` *->* `control-vm`, 
+[IMPORTANT]
+====
+Next you apply 2 fine grained `AuthorizationPolicy` resources which will allow communications between: 
+
+* The `istio-ingressgateway` *->* `control-vm`, 
 * from services in the `travel-portal` *->* to services in `travel-agency`, and 
 * all `travel-agency` services.
-+
+====
+
 [,sh,subs="attributes",role=execute]
 ----
 echo "apiVersion: security.istio.io/v1beta1
@@ -300,14 +323,20 @@ spec:
            principals: [\"cluster.local/ns/travel-agency/sa/default\",\"cluster.local/ns/travel-portal/sa/default\"]" |oc apply -f -
 ----
 
-In a little while you should once more gain access to the http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[Travel Agency Dashboard, window=_blank] and `Kiali` will show a restored network of communications between the solution. However, communication between `travel-control` and `travel-agency` services has been restricted as they are unnecessary and the applied `AuthorizationPolicy` rule do not permit it.
+====
+After a short period you should gain access to the http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}/[Travel Booking Dashboard, window=_blank] and the `Kiali` dashboard will show a restored network of communications between the services. 
+====
+
+However, the communication between the `travel-control` and `travel-agency` services has been restricted as it is unnecessary and the applied `AuthorizationPolicy` rule does not permit it.
+
+You can test this by executing the following command in the terminal:
 
 [,sh,subs="attributes",role=execute]
 ----
 oc -n travel-control exec $(oc -n travel-control get po -l app=control-vm|awk '{print $1}'|tail -n 1) -- curl -o - -I  travels-vm.travel-agency.svc.cluster.local:8000/travels/London
 ----
 
-You should receive a a response that this operation is forbidden.
+You should receive a response that this operation is forbidden.
 
 [source,yaml,subs=attributes]
 ----
@@ -321,7 +350,7 @@ x-envoy-upstream-service-time: 1
 
 ## Congratulations
 
-You have come a long way to create a more secure and robust solution for _Travel Agency_ without modifying the original VM source code and acting upon your VMs equal to other Cloud Native components.
+You have come a long way to create a more secure and robust solution for the _Travel Agency_ company *without modifying!* the original VM workloads and acting upon your VMs equal to other Cloud Native components.
 
 
 

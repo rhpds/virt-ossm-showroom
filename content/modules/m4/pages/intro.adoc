@@ -1,4 +1,4 @@
-# Module 4: Resilience, Scalability and Fault Aversion for VMs in a Cloud Native manner
+# Module 4: Advanced Traffic Management and Security with OpenShift Service Mesh for Virtual Machines
 
 In this module we are going to explore how you can further make the solution secure and robust whilst exposing it to the outside world. You will ensure that your Virtual Machine (VM) based solution can recover from failures of a VM without having to intervene to manage that as well cater for the release of a new version of a VM component.
 
