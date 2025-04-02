@@ -231,41 +231,7 @@ image::travel-dashboard.png[link="self",window=_blank]
 NOTE: *Congratulations!!*
 You helped the Travel Agency company to have their complete Booking system running in OpenShift with VMs alongside containers.
 
-## Scaling the Travel Booking Application
-
-Kubernetes pods and virtual machines (VMs) follow different scaling mechanisms due to their architectural differences.
-
-### Scaling Kubernetes Pods
-
-Kubernetes manages stateless and stateful applications using pods, which are lightweight and designed for rapid scaling.
-
-*Horizontal Scaling (Out/In):*
-Kubernetes scales pods dynamically based on CPU, memory, or custom metrics using the Horizontal Pod Autoscaler (HPA).
-Example: If CPU usage exceeds a threshold, Kubernetes creates more pod replicas automatically.
-Pods can be distributed across multiple nodes for load balancing.
-
-*Vertical Scaling (Up/Down):*
-Pods can request more CPU/memory via the Vertical Pod Autoscaler (VPA), though restarting may be required.
-Pods are ephemeral, meaning they can be replaced without losing data, making them ideal for cloud-native applications.
-
-### Scaling Virtual Machines
-
-OpenShift Virtualization enables Kubernetes to manage virtual machines (VMs), which have persistent states and require more resources than pods.
-
-*Horizontal Scaling:*
-In general there are 3 options to scale out Virtual Machines with OpenShift Virtualization:
-
-* Adding additional VMs manually (or with GitOps)
-* Using a `VirtualMachineInstanceReplicaSet` resource (Not officialy supported)
-* Using a `VirtualMachinePool` resource (Dev Preview feature)
-
-Load balancers can distribute traffic among VMs.
-
-*Vertical Scaling:*
-VMs can be scaled up by increasing CPU, memory, or disk resources.
-Unlike pods, live migration can be used to move VMs to nodes with sufficient resources.
-
-## Task 3: Scale up the control-vm
+## Task 3: Scale Up the control-vm
 
 The _busines dashboard_ is the central UI component in the Travel Booking application.
 Therefore we want to increase the cpu and memory.
@@ -318,7 +284,7 @@ NOTE: OpenShift Virtualization also supprts Live Migration when increasing resou
 *Congratulations*!
 You have scaled up a Virtual Machine.
 
-## Task 4: Scale out a VM to showcase the loadbalancing ability in OCP
+## Task 4: Scale Out a VM to showcase the loadbalancing ability in OCP
 
 As we have mentioned already, there are three options to scale out VMs.
 We are going to use a `VirtualMachinePool` resource in this task.

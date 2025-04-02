@@ -23,7 +23,10 @@ You can modify VM Resources by editing a VirtualMachine (VM) specification to in
 
 ### Scaling Out (Horizontal Scaling)
 
-Scaling out means adding more VM instances to distribute the workload. 
-This is useful for workloads that need high availability or load balancing.
+In general there are 3 options to scale out Virtual Machines with OpenShift Virtualization:
 
-We can use a Horizontal Pod Autoscaler (HPA) Alternative: Since Kubernetes HPA is designed for pods, we can use KubeVirt VirtualMachineInstances (VMI) ReplicaSets.
+* Adding additional VMs manually (or with GitOps)
+* Using a `VirtualMachineInstanceReplicaSet` resource (Not supported)
+* Using a `VirtualMachinePool` resource (Dev Preview feature)
+
+Load balancers can distribute traffic among VMs.
