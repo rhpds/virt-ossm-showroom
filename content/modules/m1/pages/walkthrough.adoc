@@ -1,7 +1,7 @@
 # Module 1 - Explore OpenShift Virtualization and connect the virtual machines
 
 
-IMPORTANT: Please login as `cluster-admin` in order to have all necessary permissions for this lab.
+IMPORTANT: Please login as `admin` user in order to have all necessary permissions for this lab.
 
 [,sh,subs="attributes",role=execute]
 ----
@@ -34,7 +34,7 @@ image::vms-overview.png[link="self",window=_blank]
 
 ====
 Click on the `cars-vm`, this directs you to the details of this VM.
-You can explore the configuration (storage, networking, hardware devices, users etc.) of this VM and also use the `Console` tab to login to the VM.
+You can explore the configuration (storage, networking, hardware devices, users etc.) of this VM and access the console by clicking on the `Console` tab.
 
 image::vm-detail.png[link="self",window=_blank]
 ====
@@ -43,11 +43,9 @@ image::vm-detail.png[link="self",window=_blank]
 Click on the `Metrics` tab. 
 This gives you an overview of the VM metrics, like memory and cpu consumption, storage and networking data.
 
-image::vm-metrics.png[link="self",window=_blank]
-====
-
-====
 Now click on the link `Virtualization dashboard` on the top right of the page and explore the Prometheus dashboard.
+
+image::vm-metrics.png[link="self",window=_blank]
 
 image::vm-metrics-dashboard.png[link="self",window=_blank]
 ====
@@ -56,7 +54,9 @@ So far we have explored the Virtualization Dashboard in the OpenShift console an
 
 NOTE: But the workloads running inside the VMs are currently not accessable from other pods or VMs. This is what we want to achieve in the next step.
 
-## About Loadbalancing Virtual Machines
+## Task 2: Create a service for the cars-vm Virtual Machine
+
+### About Loadbalancing Virtual Machines
 
 In most systems, load balancing virtual machiness typically requires multiple different tools and configurations to work properly.
 For example, to load balance two virtual machines internally and externally you might have to:
@@ -72,15 +72,12 @@ For example, to load balance two virtual machines internally and externally you 
 
 NOTE: OpenShift trivializes networking and load balancing. In this step, you'll accomplish all of this, without leaving OpenShift.
 
-## Internal Loadbalancing with Kubernetes Services
+### Internal Loadbalancing with Kubernetes Services
 
 *Kubernetes Services* are internal load balancers in OpenShift.
 These Services route traffic to resources by identifing them with a label selector.
 Labels can be applied to any OpenShift resources, including virtual machines, to identify and group them.
 You will create a service and identify the virtual machines it services as a load balancer by the means of labels on the virtual machines.
-
-## Task 2: Create a service for the cars-vm Virtual Machine
-
 The actual workload running in this virtual machine is an http based API service running on port 8000.
 Let us create a service in the `travel-agency` namespace that exposes port 8000 and sends traffic to all VMs labeled as `kubevirt.io/domain: cars-vm`
 
@@ -131,6 +128,7 @@ Go to *Workloads -> Pods* and click on one of the `virt-launcher-*` VM pods.
 image::vm-launcher-pods.png[link="self",window=_blank]
 ====
 
+====
 Click on the `Terminal` tab and execute the following curl command:
 
 
@@ -149,6 +147,7 @@ You should receive a response from the travels service similar to this:
 ----
 
 image::vm-curl-response.png[link="self",window=_blank]
+====
 
 NOTE: We have established the communication between our services and VMs. But the services are not reachable from outside the cluster.
 
