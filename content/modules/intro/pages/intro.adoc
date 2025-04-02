@@ -2,34 +2,39 @@
 
 Welcome to the lab *{lab_name}.*
 
-In this lab you will be using OpenShift as a cluster admin.
+In this lab you will be using OpenShift as a cluster administrator.
 Use the following details to log in.
 
 * **Console:** link:{openshift_cluster_console_url}[window=_blank]
 * **Username:** {openshift_cluster_admin_username}
 * **Password:** {openshift_cluster_admin_password}
 
+image::webconsole-login.png[link="self",window=_blank]
+
 ## Objectives
 
 * Understand the lab setup
 * Understand the application context
 
-## Lab instructions and Commands
+## Lab instructions and commands
 
 Here is an overview of the different types of instructions you'll find throughout the lab. 
 
 [source,shell,subs=attributes,role=execute]
 ----
-echo 'This is a shell command you should execute in the terminal. You can copy the command with the icon on the right'
+echo 'This is a shell command you should execute in the terminal. 
+You can copy the command with the icon on the right'
 ----
 
 [source,shell,subs=attributes]
 ----
-echo 'This is a shell command or shell output. But nothing you need to execute.'
+echo 'This is a shell command or shell output. 
+But nothing you need to execute.'
 ----
 
 ====
-This is an example instruction using your web browser or OpenShift Console... Just follow the instructions in this box.
+This is an example instruction using your web browser or OpenShift Web Console.
+Just follow the instructions in this box.
 ====
 
 ## Lab assets
@@ -38,7 +43,7 @@ This is an example instruction using your web browser or OpenShift Console... Ju
 
 // Open a terminal (*`Terminal`* -> *`New Terminal`* from the menu) in the _code-server_ so that you can execute the commands during the labs.
 
-You have a terminal on your right hand side and we have provided you with a repo assets (scripts) to be used throughout the lab.
+You have a terminal on your right hand side and we have provided you with a repo of assets (scripts) to be used throughout the lab.
 
 Please clone the repository as shown below:
 
@@ -62,5 +67,5 @@ You can go and inspect these resources in this repository at a later stage.
 
 [IMPORTANT]
 ====
-You will be using a *dedicated OpenShift cluster with OpenShift Virtualization, OpenShift Service Mesh and other components already installed*. In this lab you are going to explore and leverage these services, not going to install them.
+You will be using a *dedicated OpenShift cluster with OpenShift Virtualization, OpenShift Service Mesh and other components already installed*. In this lab you are going to explore and leverage these services, but not install them.
 ====
