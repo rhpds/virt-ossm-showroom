@@ -78,6 +78,7 @@ NOTE: OpenShift trivializes networking and load balancing. In this step, you'll 
 These Services route traffic to resources by identifing them with a label selector.
 Labels can be applied to any OpenShift resources, including virtual machines, to identify and group them.
 You will create a service and identify the virtual machines it services as a load balancer by the means of labels on the virtual machines.
+
 The actual workload running in this virtual machine is an http based API service running on port 8000.
 Let us create a service in the `travel-agency` namespace that exposes port 8000 and sends traffic to all VMs labeled as `kubevirt.io/domain: cars-vm`
 
