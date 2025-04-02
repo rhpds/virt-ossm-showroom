@@ -1,7 +1,107 @@
 # Declarative Management of VMs with OpenShift GitOps
 
+`Argo CD` follows the GitOps pattern of using Git repositories as the source of truth for defining the desired application state. Kubernetes manifests can be specified in several ways:
+
+* kustomize applications
+* helm charts
+* jsonnet files
+* Plain directory of YAML/json manifests
+
 ## Task 1: Explore the Argoc CD Dashboard and the existing applications
 
+====
+First we are opening the OpenShift GitOps Dashboard.
+
+In the OpenShift Web Console, click at the top on the _applications_ icon and select `Cluster Argo CD`
+
+image::argo-login.png[link="self",window=_blank]
+====
+
+====
+Click on `Login via OpenShift` and use your admin credentials: {openshift_cluster_admin_username} / {openshift_cluster_admin_password}
+
+image::argo-login-oauth.png[link="self",window=_blank]
+====
+
+====
+An *Argo CD application* is a Kubernetes resource that defines and manages the deployment of workloads based on a Git repository. It continuously syncs the desired application state from Git to the cluster, ensuring consistency and enabling automated rollbacks if deviations occur.
+
+*Sync status* - Whether or not the live state matches the target state. Is the deployed application the same as Git says it should be?
+
+*Health* - The health of the application, is it running correctly? Can it serve requests?
+
+image::argo-dashboard.png[link="self",window=_blank]
+====
+
+====
+
+image::argo-travel-agency.png[link="self",window=_blank]
+
+====
+
+====
+
+image::argo-carsvm-detail.png[link="self",window=_blank]
+
+====
+
+====
+Argo CD automates the deployment of the desired application states in the specified target environments. Application deployments can track updates to branches, tags, or be pinned to a specific version of manifests at a Git commit
+
+image::argo-app-detail.png[link="self",window=_blank]
+====
+
+====
+
+image::argo-container-logs.png[link="self",window=_blank]
+
+====
+
 ## Task 2: Create an Argo application for travel-control
+
+====
+After logging in, click the `+ New App` button as shown below:
+
+image::wt-argo-new-app.png[link="self",window=_blank]
+====
+
+====
+Give your app the name `travel-control`, use the argo project `default`, and leave the sync policy as `Manual`:
+
+image::wt-01.png[link="self",window=_blank]
+====
+
+====
+Connect the `https://github.com/rhpds/virt-ossm-workspace` repo to Argo CD by setting repository url to the github repo url, leave revision as `HEAD`, and set the path to `lab-5/travel-control`:
+
+image::wt-02.png[link="self",window=_blank]
+====
+
+====
+For Destination, set cluster URL to https://kubernetes.default.svc (or in-cluster for cluster name) and namespace to default:
+
+image::wt-03.png[link="self",window=_blank]
+====
+
+====
+After filling out the information above, click Create at the top of the UI to create the `travel-control` application:
+
+image::wt-04.png[300,link="self",window=_blank]
+====
+
+====
+Once the `travel-control` application is created, you can now view its status:
+
+The application status is initially in OutOfSync state since the application has yet to be deployed, and no Kubernetes resources have been created. To sync (deploy) the application:
+
+On the Applications page, click on Sync button of the `travel-control` application:
+
+A panel will be opened and then, click on Synchronize button.
+
+You can see more details by clicking at the `travel-control` application:
+
+====
+
+
 
 ## Task 3: Validate Argo CD Self-Healing (delete a VM)
