@@ -1,5 +1,13 @@
 # Declarative Management of VMs with OpenShift GitOps
 
+NOTE: All assets for this module are in the folder `lab-5`. Please change the directory into this folder.
+
+[,sh,subs="attributes",role=execute]
+----
+cd $HOME/virt-ossm-workspace/lab-5
+----
+
+OpenShift GitOps is based on the `Argo CD` project.
 `Argo CD` follows the GitOps pattern of using Git repositories as the source of truth for defining the desired application state. Kubernetes manifests can be specified in several ways:
 
 * kustomize applications
@@ -7,10 +15,15 @@
 * jsonnet files
 * Plain directory of YAML/json manifests
 
-## Task 1: Explore the Argoc CD Dashboard and the existing applications
+NOTE: You'll notice that three parts of the application, the `travel-portal` and `travel-agency` as well as the `service mesh` components are already managed by OpenShift GitOps.
+
+We will be using a `helm-chart` to provide the Kubernetes and service mesh manifests for the missing `travel-control` domain.
+But first, let's explore what is already managed by OpenShift GitOps.
+
+## Task 1: Explore the Argoc CD Dashboard and the existing Argo applications
 
 ====
-First we are opening the OpenShift GitOps Dashboard.
+First, we are going to open the OpenShift GitOps Dashboard.
 
 In the OpenShift Web Console, click at the top on the _applications_ icon and select `Cluster Argo CD`
 
@@ -18,46 +31,88 @@ image::argo-login.png[link="self",window=_blank]
 ====
 
 ====
-Click on `Login via OpenShift` and use your admin credentials: {openshift_cluster_admin_username} / {openshift_cluster_admin_password}
+Click on `LOG IN VIA OPENSHIFT` and use your admin credentials: {openshift_cluster_admin_username} / {openshift_cluster_admin_password}
 
 image::argo-login-oauth.png[link="self",window=_blank]
 ====
 
 ====
+Welcome to the Argo Dashboard.
+
+You see 4 Argo applications running and being managed by OpenShift GitOps. (You can ignore the `bootstrap` application)
+
 An *Argo CD application* is a Kubernetes resource that defines and manages the deployment of workloads based on a Git repository. It continuously syncs the desired application state from Git to the cluster, ensuring consistency and enabling automated rollbacks if deviations occur.
+
+You also notice the Sync status and the Health for each application:
 
 *Sync status* - Whether or not the live state matches the target state. Is the deployed application the same as Git says it should be?
 
 *Health* - The health of the application, is it running correctly? Can it serve requests?
 
 image::argo-dashboard.png[link="self",window=_blank]
+
+Now click on the `travel-agency` application.
 ====
 
 ====
+You now see a visual representation of the Kubernetes resources that are deployed as part of this argo application.
 
 image::argo-travel-agency.png[link="self",window=_blank]
 
+Now click i.e. on the `virt-launcher-cars-vm...` pod to look at the details of this component.
 ====
 
 ====
+You'll get an overview with the details and the state of this pod. You can also explore the deployed `LIVE MANIFEST` of this component.
 
 image::argo-carsvm-detail.png[link="self",window=_blank]
 
+Now click on the `LOGS` tab.
 ====
 
 ====
-Argo CD automates the deployment of the desired application states in the specified target environments. Application deployments can track updates to branches, tags, or be pinned to a specific version of manifests at a Git commit
-
-image::argo-app-detail.png[link="self",window=_blank]
-====
-
-====
+You see the logs of the running containers inside
+ this pod. You can switch between the containers by selecting them from the shown dropdown menu.
 
 image::argo-container-logs.png[link="self",window=_blank]
 
+Close this window which brings you back to the overview. 
+====
+
+====
+Back in the overview click on `DETAILS` at the top.
+
+This gives you an overview of the configuration for this argo application, like the source git repository, the target cluster, status and health, as well as the configured  
+
+Sync Policy:
+
+* *Automated Sync* – Automatically applies changes from Git to the cluster when updates are detected, without manual intervention.
+* *Prune Resources* – Deletes resources from the cluster if they are removed from the Git repository, preventing orphaned resources.
+* *Self-Heal* – Continuously monitors and corrects drift by reverting manual changes in the cluster to match the desired state from Git.
+
+Argo CD automates the deployment of the desired application states in the specified target environments. Application deployments can track updates to branches, tags, or be pinned to a specific version of manifests at a Git commit.
+
+image::argo-app-detail.png[link="self",window=_blank]
+
+Close the window and click on `Applications` in the left menu of the Argo Dashboard.
 ====
 
 ## Task 2: Create an Argo application for travel-control
+
+Imagine a DevOps engineer accidentally deletes the `travel-control` namespace that contains critical applications for the _Travel Agency_ company. Without Argo CD, this would require manual intervention to restore the namespace and redeploy the applications, leading to downtime.
+
+Exactly, what we do right now!
+
+[,sh,subs="attributes",role=execute]
+----
+oc delete project travel-control
+----
+
+IMPORTANT: With Argo CD and Self-Heal enabled, the system would detect the deletion and automatically recreates the namespace and all its resources from the Git repository. This ensures minimal disruption and maintains the desired state without manual effort.
+
+This makes Argo CD a great fit for teams that need automated recovery, drift correction, and continuous deployment in OpenShift.
+
+Now let us create an argo app for the `travel-control` component.
 
 ====
 After logging in, click the `+ New App` button as shown below:
@@ -73,6 +128,8 @@ image::wt-01.png[link="self",window=_blank]
 
 ====
 Connect the `https://github.com/rhpds/virt-ossm-workspace` repo to Argo CD by setting repository url to the github repo url, leave revision as `HEAD`, and set the path to `lab-5/travel-control`:
+
+NOTE: We have already provided all necessary Kubernetes manifests in this `repository` and `path`. Feel free to explore this Helm Chart if you like. 
 
 image::wt-02.png[link="self",window=_blank]
 ====
