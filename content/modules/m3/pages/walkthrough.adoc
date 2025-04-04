@@ -13,7 +13,7 @@ Firstly, find the URLs of the service mesh observability components by executing
 
 [,sh,subs="attributes",role=execute]
 ----
-echo "http://$(oc get route kiali -o jsonpath='{.spec.host}' -n istio-system)"
+echo "https://$(oc get route kiali -o jsonpath='{.spec.host}' -n istio-system)"
 echo "https://$(oc get route jaeger -o jsonpath='{.spec.host}' -n istio-system)"
 echo "https://$(oc get route grafana -o jsonpath='{.spec.host}' -n istio-system)"
 ----
@@ -27,7 +27,9 @@ Jaeger is an open-source **distributed tracing** system designed to monitor and 
 The `Jaeger` dashboard offers the capability to inspect traces of the traffic exchanged within the _Travel Booking_ application.
 
 ====
-Login to the dashboard at the `Jaeger` URL by using your credentials *{openshift_cluster_admin_username}/{openshift_cluster_admin_password}*.
+Login to the dashboard at the `Jaeger` URL by using credentials:
+* username: *{openshift_cluster_admin_username}*
+* password: *{openshift_cluster_admin_password}*.
 
 At the `Authorize Access` page select `Allow selected permissions`. 
 
@@ -110,7 +112,7 @@ image::06-t2-ossm-travel-control-1-container.png[link=self, window=blank]
 
 Lets add the _Travel Booking_ application to the service mesh. 
 
-First we create a `ServiceMeshMember` resource for each of the 3 namespaces of the _Travel Booking_ application, which will include them to the mesh. (See the details at {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-3/servicemeshmember.yaml[servicemeshmember.yaml, window=_blank])
+First we create a `ServiceMeshMember` resource for each of the 3 namespaces of the _Travel Booking_ application, which will include them to the mesh. (For details click {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-3/servicemeshmember.yaml[servicemeshmember.yaml, window=_blank] to go to the repository).
 
 [,sh,subs="attributes",role=execute]
 ----
