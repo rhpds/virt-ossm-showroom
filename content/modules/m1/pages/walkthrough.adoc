@@ -290,9 +290,3 @@ Now we clean up by deleting the `NetworkPolicy`:
 ----
 oc delete networkpolicy noegress -n travel-agency
 ----
-
-## Congratulations
-
-In this module you have created Kubernetes Services for all virtual machines and made sure all application components are now reachable from inside and ouside of the OpenShift cluster. 
-And you have also seen how easy it is to leverage cloud native resouces to implement a Network Egress Firewall.
-

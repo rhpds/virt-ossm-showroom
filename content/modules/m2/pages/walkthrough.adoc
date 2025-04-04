@@ -269,17 +269,9 @@ Select *2 vCPU and 4GB of Memory* and click *Save*.
 image::increase-resources.png[link="self",window=_blank]
 ====
 
-Now we see that the VM has pending changes. In order to get the changes applied, we need to restart the VM.
+Now we see that the VM is in the state `migrating`. The changes will automatically be applied.
 
-image::pending-changes.png[link="self",window=_blank]
-
-====
-Click on the top right dropdown menu *Actions -> Restart*
-
-After the VM is restarted, log back in and check the cpu and memory again.
-====
-
-NOTE: OpenShift Virtualization also supprts Live Migration when increasing resources, so it can migrate VMs across nodes for better resource utilization. The underlying node must have enough available resources for scaling up.
+NOTE: OpenShift Virtualization also supports Live Migration when increasing resources, so it can migrate VMs across nodes for better resource utilization. The underlying node must have enough available resources for scaling up.
 
 *Congratulations*!
 You have scaled up a Virtual Machine.
@@ -396,7 +388,7 @@ spec:
 oc apply -f ./vm-pool-hpa.yaml
 ----
 
-Now the `HorizontalPodAutoscaler` will scale up instances if the CPU utilization exceeds 50%.
+Now the `HorizontalPodAutoscaler` will scale up to 10 instances if the CPU utilization exceeds 50%.
 
 ====
 Go to *Workloads -> HorizontalPodAutoscalers* and select `vm-pool-hpa`.
@@ -404,7 +396,8 @@ Go to *Workloads -> HorizontalPodAutoscalers* and select `vm-pool-hpa`.
 image::vm-hpa-overview.png[link="self",window=_blank]
 
 In the Metrics section you'll see the Current and Target Values. If the Target Value is getting exceeded additional VMs will spin up.
-It might look like in the next image...
+
+Depending on the CPU load of your specific cluster, it might look like this:
 
 image::vms-hpa.png[link="self",window=_blank]
 ====
@@ -417,8 +410,3 @@ oc delete hpa vm-pool-hpa -n travel-control
 
 oc patch virtualmachinepool travel-control-vm-pool --type merge --patch '{"spec":{"replicas":1}}'
 ----
-
-## Congratulations
-
-In this module you have deployed the business dashboard (aka `control-vm`), exposed it to the cluster outside and explored some of the scaling capabilities with OpenShift Virtualization.
-In the next module we are going to introduce OpenShift Service Mesh and using it in the context of Virtual Machines.

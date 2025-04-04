@@ -2,4 +2,7 @@
 
 ## Congratulations on completing this module!
 
+In this module you have deployed the business dashboard (aka `control-vm`), exposed it to the cluster outside and explored some of the scaling capabilities with OpenShift Virtualization.
+In the next module we are going to introduce OpenShift Service Mesh and using it in the context of Virtual Machines.
+
 Continue now to Module 3 - _Enhancing Networking & Observability with OpenShift Service Mesh (OSSM)_ 

@@ -2,4 +2,7 @@
 
 ## Congratulations on completing this module!
 
+In this module you have created Kubernetes Services for all virtual machines and made sure all application components are now reachable from inside and ouside of the OpenShift cluster. 
+And you have also seen how easy it is to leverage cloud native resouces to implement a Network Egress Firewall.
+
 Continue now to Module 2 - _Scaling Virtual Machines on OpenShift_ 
