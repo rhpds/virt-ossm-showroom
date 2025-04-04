@@ -349,10 +349,3 @@ server: envoy
 x-envoy-upstream-service-time: 1
 ----
 
-## Congratulations
-
-You have come a long way to create a more secure and robust solution for the _Travel Agency_ company *without modifying!* the original VM workloads and acting upon your VMs equal to other Cloud Native components.
-
-
-
-

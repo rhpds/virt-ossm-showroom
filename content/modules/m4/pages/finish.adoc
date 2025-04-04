@@ -2,7 +2,9 @@
 
 ## Congratulations on completing this module!
 
-You have accomplished quite a bit. 
+
+You have come a long way to create a more secure and robust solution for the _Travel Agency_ company. 
+
 You have explored VMs in OpenShift, used Service Mesh for Observability, traffic management, canary rollouts and security enhancements and also scaled virtual machines. 
 
 IMPORTANT: All of this has been achieved without modifying anything inside the VMs!

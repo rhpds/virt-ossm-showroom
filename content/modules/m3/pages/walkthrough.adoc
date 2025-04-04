@@ -30,7 +30,7 @@ The `Jaeger` dashboard offers the capability to inspect traces of the traffic ex
 Login to the dashboard at the `Jaeger` URL by using credentials:
 
 * username: *{openshift_cluster_admin_username}*
-* password: *{openshift_cluster_admin_password}*.
+* password: *{openshift_cluster_admin_password}*
 
 At the `Authorize Access` page select `Allow selected permissions`. 
 
@@ -88,7 +88,7 @@ Leave the `Grafana` dahsboard open in your browser as we will come back to it a 
 Access `Kiali` to explore a visualisation of the _Travel Booking_ application in the mesh. Login by using credentials:
 
 * username: *{openshift_cluster_admin_username}*
-* password: *{openshift_cluster_admin_password}*.
+* password: *{openshift_cluster_admin_password}*
 ====
 
 ====
