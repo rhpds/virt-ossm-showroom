@@ -2,8 +2,11 @@
 
 ## Congratulations on completing this module!
 
-You have already experienced the ease with which a VM can be enhanced with features of cross-cutting concern (security, observability) in a cloud native world. 
+In this module you have introduced the _Travel Booking_ namespaces, containers and VMs to service mesh, reviewed all the observability tooling on offer from OpenShift Service Mesh and by now have an understanding of how sidecars configure cross-cutting features of security, traffic and monitoring without altering the internal application components whether these are VMs or containers. 
 
-In the next scenario you will be going further by configuring resilliency, fault-tolerance and automation of deploying and managing multiple versions of your VMs.
+The ease with which a VM can be enhanced with features of cross-cutting concern (security, observability) in a cloud native world is the most appealing aspect of all.
 
-Continue now to Module 4 - _Resilience, Scalability and Fault Aversion for VMs in a Cloud Native manner_ 
+
+In the next scenario you will be going further by configuring resillience, fault-tolerance and automation of deploying and managing multiple versions of your VMs.
+
+Continue now to Module 4 - _Enhancing Traffic Resilience and Security for Virtual Machines with OpenShift Service Mesh_ 

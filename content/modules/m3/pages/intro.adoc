@@ -28,7 +28,7 @@ Even though OpenShift Service Mesh is primarily designed for containerized workl
 
 NOTE: The following section provide additional information on the Service Mesh Architecture. *Feel free to skip the following section to save time* and come back later if needed.
 
-## *Optional*: OpenShift Service Mesh Architecture
+## *Informational Section*: OpenShift Service Mesh Architecture
 
 image::02-OSSM-Components.png[]
 

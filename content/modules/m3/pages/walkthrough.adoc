@@ -65,7 +65,7 @@ Leave the `Jaeger` dahsboard open in your browser as we will come back to it a l
 Access the `Grafana` dashboard by following the link to the `Grafana` URL with credentials:
 
 * username: *{openshift_cluster_admin_username}*
-* password: */{openshift_cluster_admin_password}*
+* password: *{openshift_cluster_admin_password}*
 ====
 
 ====
@@ -88,7 +88,7 @@ Leave the `Grafana` dahsboard open in your browser as we will come back to it a 
 Access `Kiali` to explore a visualisation of the _Travel Booking_ application in the mesh. Login by using credentials:
 
 * username: *{openshift_cluster_admin_username}*
-* password: */{openshift_cluster_admin_password}*.
+* password: *{openshift_cluster_admin_password}*.
 ====
 
 ====
@@ -118,14 +118,14 @@ image::06-t2-ossm-travel-control-1-container.png[link=self, window=blank]
 
 Lets add the _Travel Booking_ application to the service mesh. 
 
-First we create a `ServiceMeshMember` resource for each of the 3 namespaces of the _Travel Booking_ application, which will include them to the mesh. (For details click {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-3/servicemeshmember.yaml[servicemeshmember.yaml, window=_blank] to go to the repository).
+First we create a `ServiceMeshMember` resource for each of the 3 namespaces of the _Travel Booking_ application, which will include them to the mesh. (click for details of the configuration {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob/main/lab-3/servicemeshmember.yaml[servicemeshmember.yaml, window=_blank]). Now execute in the *Terminal* the following:
 
 [,sh,subs="attributes",role=execute]
 ----
 oc apply -f servicemeshmember.yaml
 ----
 
-Now we add the sidecar container to each of the workloads (VMs and containers).
+Then we add the sidecar container to each of the workloads (VMs and containers).
 This forms the actual dataplane of the mesh, and consists of an `envoy-proxy` (namely the `istio-proxy` container).
 
 The provided scripts will insert the injection annotation `sidecar.istio.io/inject` in each workload and also restart them, so that service mesh can inject the `istio-proxy` container and start applying the configured policies.
@@ -365,7 +365,3 @@ image::07-t2-kiali-configs.gif[link=self, window=blank]
 We do explore https://istio.io/latest/docs/reference/config/networking/destination-rule/[`DestinationRule`,window=_blank](s) and additional mesh configurations more extensively in the next module.
 
 NOTE: Take a moment to pause and reflect on what has happened! The change of annotating the `VirtualMachine` resource with `sidecar.istio.io/inject` has achieved all this. The VMs did not get altered but you are already getting a whole new experience. 
-
-## Congratulations
-
-In this module you have introduced the _Travel Booking_ namespaces, containers and VMs to service mesh, reviewed all the observability tooling on offer from OpenShift Service Mesh and by now have an understanding of how sidecars configure cross-cutting features of security, traffic and monitoring without altering the internal application components whether these are VMs or containers. The ease with which mesh has offered this is the most appealing aspect of all.
