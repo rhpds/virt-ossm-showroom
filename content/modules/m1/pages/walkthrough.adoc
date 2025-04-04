@@ -252,22 +252,29 @@ spec:
 ### Validate that the Internet Access is Blocked from the cars-vm virtual machine
 
 ====
-. Go back to *Virtualization -> VirtualMachines -> cars-vm -> Console*
-Login to the console and try to access the internet.
+Go back to *Virtualization -> VirtualMachines -> cars-vm -> Console*
+
+Click on `Guest login credentials`. Copy and paste the credentials into the Console to log in.
+
+image:vm-credentials.png[link="self",window=_blank]
+====
+
+====
+In the VM terminal, execute the following command: 
 
 [,sh,role=execute]
 ----
 curl http://www.google.com
 ----
 
-NOTE: The egress to Internet connection has been denied with a timeout.
+IMPORTANT: The egress to Internet connection has been denied with a timeout.
 ====
 
 Now test the same from one of the other VMs.
 
 ====
-. Go to *Virtualization -> VirtualMachines -> travels-vm -> Console*
-Login to the console and try to access the internet from here. This should work!
+Go to *Virtualization -> VirtualMachines -> travels-vm -> Console*.
+Log in the same way described above, and try to access the internet from this VM. This should work!
 
 [,sh,role=execute]
 ----
