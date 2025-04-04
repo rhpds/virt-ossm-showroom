@@ -20,7 +20,7 @@ echo "https://$(oc get route grafana -o jsonpath='{.spec.host}' -n istio-system)
 
 NOTE: The Service Mesh components have been installed by the platform team in the `istio-system` namespace, therefore you can you can also find the observability URLs in the namespace `istio-system` at *Networking -> Routes* menu of the OpenShift console.
 
-### 1. Jaeger Tracing
+### Tracing with Jaeger 
 
 Jaeger is an open-source **distributed tracing** system designed to monitor and troubleshoot transactions in **microservices architectures**. It helps track requests as they flow through services, providing insights into **latency, dependencies, and bottlenecks**. Jaeger is widely used for **performance optimization, root cause analysis, and observability** in cloud-native applications.
 
@@ -59,7 +59,7 @@ Currently, you don't see any services listed. That is correct!
 
 Leave the `Jaeger` dahsboard open in your browser as we will come back to it a little bit later and lets explore the next observability tool.
 
-### 2. Grafana Dashboard
+### Grafana Dashboards
 
 ====
 Access the `Grafana` dashboard by following the link to the `Grafana` URL with credentials:
@@ -82,7 +82,7 @@ There are additional dashboards under *Dashboards → Browse → Istio* to help 
 
 Leave the `Grafana` dahsboard open in your browser as we will come back to it a little later and lets explore `Kiali`.
 
-### 3. Kiali Dashboard
+### Mesh Visualization in Kiali Console
 
 ====
 Access `Kiali` to explore a visualisation of the _Travel Booking_ application in the mesh. Login by using credentials:
@@ -157,7 +157,7 @@ image::06-2-containers.gif[link=self, window=blank]
 
 ## Task 3: Validate that the _Travel Booking_ application is part of the mesh
 
-### 1. Kiali Dashboard 
+### Mesh Visualization in Kiali Console 
 Go back to the `Kiali` Dashboard. 
 
 We are now able to visualise network information about the _Travel Booking_ services. 
@@ -178,7 +178,7 @@ IMPORTANT: Wow this is truly brilliant. Containers and VMs working side by side 
 
 NOTE: You can explore additional features of Kiali in the optional Task 5.
 
-### 2. Jaeger Tracing
+### Tracing with Jaeger
 
 Go back to the `Jaeger` Tracing console which now contains traces of the requests. 
 
@@ -204,7 +204,7 @@ The animated icon showcases reviewing successful and failed requests.
 image::09-t2-jaeger-tracing.gif[link=self, window=blank]
 ====
 
-### 3. Grafana Dashboard
+### Grafana Dashboards
 
 ====
 Finally, go back to the `Grafana dashboard`.
