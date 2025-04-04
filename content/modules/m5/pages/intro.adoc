@@ -1,11 +1,6 @@
 # Declarative Management of VMs with OpenShift GitOps
 
-We've accomplished quite a bit so far. 
-We've explored VMs in OpenShift, used Service Mesh for Observability, traffic management, canary rollouts and security enhancements. And we've also scaled virtual machines. 
-
-IMPORTANT: We have done all of it without modifying anything inside the VMs!
-
-In this module we want to deploy everything declaratively and let it be managed by OpenShift GitOps. 
+In this module we want to deploy everything declaratively and allow the configurations to be managed by OpenShift GitOps. 
 
 ## Objectives
 
