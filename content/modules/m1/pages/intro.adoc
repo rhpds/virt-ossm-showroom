@@ -1,19 +1,5 @@
 # Module 1 - Explore OpenShift Virtualization and connect the virtual machines
 
-## Objectives
-
-This module covers key aspects of modernizing VMs on OpenShift, including:
-
-*Understanding the goals of VM modernization* - Learn why organizations are integrating VMs with OpenShift and how it enhances automation, security, and lifecycle management.
-
-*Key OpenShift features for VMs* - Explore built-in capabilities such as monitoring and security enhancements designed to optimize VM management.
-
-*Kubernetes services for VMs* - Understand how VMs can leverage Kubernetes-native features like service discovery and load balancing.
-
-*Kubernetes network policies* - Learn how to apply Kubernetes network policies to secure and control VM network traffic.
-
-## About OpenShift Virtualization
-
 OpenShift Virtualization provides the scalable, enterprise-grade virtualization functionality in Red Hat OpenShift. You can use it to manage virtual machines (VMs) exclusively or alongside container workloads.
 
 image::ocp-virt-arch.png[link="self",window=_blank]
@@ -27,9 +13,21 @@ OpenShift Virtualization adds new objects into your OpenShift Container Platform
 * Managing network interface controllers and storage disks attached to VMs
 * Live migrating VMs between nodes
 
-NOTE: The following sections provide additional information on Cloud-native and Cloud-native patterns. Feel free to skip this sections to save time and come back later if needed.
+## Objectives
 
-## Optional: About Cloud-native
+This module covers key aspects of modernizing VMs on OpenShift, including:
+
+*Understanding the goals of VM modernization* - Learn why organizations are integrating VMs with OpenShift and how it enhances automation, security, and lifecycle management.
+
+*Key OpenShift features for VMs* - Explore built-in capabilities such as monitoring and security enhancements designed to optimize VM management.
+
+*Kubernetes services for VMs* - Understand how VMs can leverage Kubernetes-native features like service discovery and load balancing.
+
+*Kubernetes network policies* - Learn how to apply Kubernetes network policies to secure and control VM network traffic.
+
+NOTE: The following sections provide additional information on Cloud-native and Cloud-native patterns. *Feel free to skip the following sections to save time* and come back later if needed.
+
+## *Optional*: About Cloud-native
 
 Cloud-native is an approach to building and running applications that fully leverage cloud computing’s scalability, flexibility, and automation. It emphasizes microservices, containerization, declarative infrastructure, and continuous delivery to create resilient and efficient applications.
 
@@ -37,7 +35,7 @@ Cloud-native applications are designed to be dynamic, scalable, and portable acr
 
 By adopting cloud-native principles, organizations can improve agility, reduce operational overhead, and accelerate innovation in modern, distributed environments.
 
-## Optional: Cloud-native Patterns
+## *Optional*: Cloud-native Patterns
 
 Cloud-native architectures follow key design patterns to ensure scalability, resilience, and automation. Some of the most common patterns include:  
 
