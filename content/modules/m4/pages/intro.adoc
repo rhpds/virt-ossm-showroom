@@ -17,6 +17,9 @@ In this module we are going to explore how you can further make the solution sec
 
 In traditional monolithic applications new features where released with a feature toggle which when enabled it would allow a subset of requests to flow through the new feature functionality. In a cloud native world where microservices contain the subset of the functionality the toggle can be the version associated with the a microservice deployment.
 
+
+image::canary-01.png[link="self",window=_blank]
+
 `Canary release` (or canary launch or canary deployment) allows for the release of a new feature microservice targeted by a flag, the URI of changed version or other means available to differentiate between the instance of old and new feature.
 
 ### Circuit Breakers
