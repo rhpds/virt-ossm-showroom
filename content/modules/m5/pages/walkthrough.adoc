@@ -206,7 +206,7 @@ Now we are going to delete all content from the `travel-control` namespace. Exec
 
 [,sh,subs="attributes",role=execute]
 ----
-oc delete AuthorizationPolicy,DestinationRule,Route,Service,smm,VirtualMachine,VirtualService -l module=m5
+oc delete AuthorizationPolicy,DestinationRule,Route,Service,smm,VirtualMachine,VirtualService -l module=m5 -n travel-control
 ----
 
 ====
