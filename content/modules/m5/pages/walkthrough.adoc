@@ -7,13 +7,7 @@ NOTE: All assets for this module are in the folder `lab-5`. Please change the di
 cd $HOME/virt-ossm-workspace/lab-5
 ----
 
-OpenShift GitOps is based on the `Argo CD` project.
-`Argo CD` follows the GitOps pattern of using Git repositories as the source of truth for defining the desired application state. Kubernetes manifests can be specified in several ways:
-
-* kustomize applications
-* helm charts
-* jsonnet files
-* Plain directory of YAML/json manifests
+In this module we want to deploy everything declaratively and let it be managed by OpenShift GitOps. 
 
 NOTE: You'll notice that three parts of the application, the `travel-portal` and `travel-agency` as well as the `service mesh` components are already managed by OpenShift GitOps.
 
@@ -90,8 +84,6 @@ Sync Policy:
 * *Prune Resources* – Deletes resources from the cluster if they are removed from the Git repository, preventing orphaned resources.
 * *Self-Heal* – Continuously monitors and corrects drift by reverting manual changes in the cluster to match the desired state from Git.
 
-Argo CD automates the deployment of the desired application states in the specified target environments. Application deployments can track updates to branches, tags, or be pinned to a specific version of manifests at a Git commit.
-
 image::argo-app-detail.png[link="self",window=_blank]
 
 Close the window and click on `Applications` in the left menu of the Argo Dashboard.
@@ -135,9 +127,20 @@ image::wt-02.png[link="self",window=_blank]
 ====
 
 ====
-For Destination, set cluster URL to https://kubernetes.default.svc (or in-cluster for cluster name) and namespace to default:
+For Destination, set cluster URL to https://kubernetes.default.svc (or in-cluster for cluster name) and leave the namespace empty:
 
 image::wt-03.png[link="self",window=_blank]
+====
+
+====
+In the Helm section, provide the URL of the Service Mesh ingress gateway by overwriting the `ossm_ingress` parameter:
+
+[,sh,subs="attributes",role=execute]
+----
+istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}
+----
+
+image::wt-05.png[link="self",window=_blank]
 ====
 
 ====
@@ -147,18 +150,74 @@ image::wt-04.png[300,link="self",window=_blank]
 ====
 
 ====
-Once the `travel-control` application is created, you can now view its status:
+Once the `travel-control` argo application is created, you can now view its status:
 
-The application status is initially in OutOfSync state since the application has yet to be deployed, and no Kubernetes resources have been created. To sync (deploy) the application:
+image::wt-06.png[link="self",window=_blank]
 
-On the Applications page, click on Sync button of the `travel-control` application:
-
-A panel will be opened and then, click on Synchronize button.
-
-You can see more details by clicking at the `travel-control` application:
-
+The application status is initially in OutOfSync state since the application has yet to be deployed, and no Kubernetes resources have been created.
 ====
 
+====
+To sync (deploy) the application:
 
+On the Applications page, click on `SYNC` button of the `travel-control` application. 
+A panel will be opened and then, click on `SYNCHRONIZE` button.
 
-## Task 3: Validate Argo CD Self-Healing (delete a VM)
+image::wt-07.png[link="self",window=_blank]
+====
+
+====
+By clicking on the `travel-control` application you open the details of the app, and you'll see which resources have been applied, as well as the Sync status, last sync and application health.
+
+Wait for a few minutes until everything is up and running.
+
+image::wt-08.png[link="self",window=_blank]
+====
+
+====
+In the last step we test if the whole solution is working correctly, by opening the *Business Dashboard* of the _Booking Application_ again.
+
+http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}
+
+image::wt-08.png[link="self",window=_blank]
+====
+
+## Task 3: Validate Argo CD Self-Healing
+
+To test Argo CD’s **self-healing capability**, you can manually delete a Kubernetes resource managed by Argo CD. With **Automated Sync** and **Self-Heal** enabled, Argo CD will detect the drift from the desired Git state and automatically **recreate the deleted resource**, confirming that self-healing is working as expected.
+
+====
+First, we need to enable `Auto-Sync` and `Self-Healing` for the travel-control application.
+
+Click on `DETAILS`, and in the details window scroll down and click on `ENABLE AUTO-SYNC`.
+
+image::travel-control-detail.png[link="self",window=_blank]
+====
+
+====
+Now click on `ENABLE` for the `Self Heal` sync option.
+
+image::sync-policy.png[link="self",window=_blank]
+
+And that is it!
+====
+
+Now we are going to delete all content from the `travel-control` namespace. Execute the following command in the terminal on your right hand side:
+
+[,sh,subs="attributes",role=execute]
+----
+oc delete AuthorizationPolicy,DestinationRule,Route,Service,smm,VirtualMachine,VirtualService -l module=m5
+----
+
+====
+The Argo CD dashboard will briefly show:
+
+1. **Application status as "OutOfSync"** – indicating that the live cluster state no longer matches the Git source.
+2. The deleted resource will **disappear from the resource tree** temporarily.
+3. Within moments, Argo CD will **auto-sync**, and the deleted resource will **reappear**, restoring the desired state.
+4. The status will return to **"Synced" and "Healthy"**, confirming self-healing has taken place.
+
+image::auto-sync.png[link="self",window=_blank]
+====
+
+*Congratulations!!* You helped the _Travel Agency_ company to operate their whole solution now through GitOps.

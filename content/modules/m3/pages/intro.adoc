@@ -26,7 +26,9 @@ Even though OpenShift Service Mesh is primarily designed for containerized workl
 * *Gradual Migration* – Allows a hybrid approach, where legacy VMs can coexist and gradually transition into a containerized environment.
 * *Policy Enforcement* – Ensures compliance by applying service-level access control and security policies uniformly across VMs and containers.
 
-## OpenShift Service Mesh Architecture
+NOTE: The following section provide additional information on the Service Mesh Architecture. *Feel free to skip the following section to save time* and come back later if needed.
+
+## *Optional*: OpenShift Service Mesh Architecture
 
 image::02-OSSM-Components.png[]
 
