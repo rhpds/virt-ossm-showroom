@@ -16,7 +16,7 @@ image::01-OSSM-ServiceMesh.png[]
 
 Red Hat OpenShift Service Mesh is an integrated service mesh solution based on _Istio, Kiali, and Jaeger_, designed to simplify microservices communication, security, and observability in OpenShift environments. It provides a uniform way to manage service-to-service interactions, including *traffic control, security policies, and monitoring*.
 
-NOTE: OpenShift https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Service Mesh] is an add-on service that can be installed through an operator.
+NOTE: OpenShift https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Service Mesh,window=_blank] is an add-on service that can be installed through an operator.
 
 Even though OpenShift Service Mesh is primarily designed for containerized workloads, it also supports VMs by integrating them into the mesh. Key benefits for VMs include:
 
