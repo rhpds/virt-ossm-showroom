@@ -14,7 +14,7 @@ NOTE: You'll notice that three parts of the application, the `travel-portal` and
 We will be using a `helm-chart` to provide the Kubernetes and service mesh manifests for the missing `travel-control` domain.
 But first, let's explore what is already managed by OpenShift GitOps.
 
-## Task 1: Explore the Argoc CD Dashboard and the existing Argo applications
+## Task 1: Explore the ArgoCD Dashboard and the existing Argo applications
 
 ====
 First, we are going to open the OpenShift GitOps Dashboard.
