@@ -36,7 +36,8 @@ Execute the script {virt_ossm_workspace_repo}/{virt_ossm_workspace_project}/blob
 ----
 
 ====
-Refresh the URL of the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}[window=_blank] and you should be served with the familiar Travel Booking Dashboard. 
+Refresh the URL of the _Ingress Gateway_ at http://istio-ingressgateway-istio-system.{openshift_cluster_ingress_domain}[window=_blank] and you should be served with the familiar Travel Booking Dashboard.
+It may take a few seconds for the Istio Gateway configuration to take effect.
 ====
 
 *Congratulations your solution is public!*.
