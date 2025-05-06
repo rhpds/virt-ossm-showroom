@@ -1,6 +1,6 @@
 ---
 site:
-  title: ""
+  title: "OpenShift Virtualization with Service Mesh and GitOps"
   start_page: modules::index.adoc
 
 content:
